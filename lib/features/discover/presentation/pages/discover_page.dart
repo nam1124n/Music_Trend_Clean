@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:login_flutter/features/admin/presentation/bloc/song_bloc.dart';
+import 'package:login_flutter/features/admin/presentation/bloc/song_event.dart';
 
 import '../widgets/custom_bottom_nav.dart';
 import '../widgets/discover_app_bar.dart';
@@ -21,6 +24,7 @@ class _DiscoverPageState extends State<DiscoverPage> with SingleTickerProviderSt
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    context.read<SongBloc>().add(LoadSongsEvent());
   }
 
   @override

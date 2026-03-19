@@ -6,6 +6,7 @@ import 'package:login_flutter/features/admin/domain/entities/song_entity.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_bloc.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_event.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_state.dart';
+import 'package:login_flutter/features/admin/presentation/pages/widget/label_text.dart';
 
 class AdminSongFormPage extends StatefulWidget {
   const AdminSongFormPage({super.key});
@@ -105,7 +106,7 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // ── Ảnh bìa ──
-                    const _Label('Ảnh bìa'),
+                    const LabelText('Ảnh bìa'),
                     const SizedBox(height: 8),
                     GestureDetector(
                       onTap: isLoading ? null : _pickImage,
@@ -145,7 +146,7 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                     const SizedBox(height: 24),
 
                     // ── File Audio ──
-                    const _Label('File Audio (mp3, m4a...)'),
+                    const LabelText('File Audio (mp3, m4a...)'),
                     const SizedBox(height: 8),
                     GestureDetector(
                       onTap: isLoading ? null : _pickAudio,
@@ -189,7 +190,7 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                     const SizedBox(height: 24),
 
                     // ── Tên bài hát ──
-                    const _Label('Tên bài hát'),
+                    const LabelText('Tên bài hát'),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _titleController,
@@ -201,7 +202,7 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                     const SizedBox(height: 20),
 
                     // ── Nghệ sĩ ──
-                    const _Label('Tên nghệ sĩ'),
+                    const LabelText('Tên nghệ sĩ'),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _artistController,
@@ -285,19 +286,4 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
       );
 }
 
-class _Label extends StatelessWidget {
-  final String text;
-  const _Label(this.text);
 
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontWeight: FontWeight.w700,
-        fontSize: 14,
-        color: Color(0xFF374151),
-      ),
-    );
-  }
-}

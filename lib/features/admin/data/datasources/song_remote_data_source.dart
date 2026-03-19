@@ -3,44 +3,66 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
 class SongRemoteDataSource {
+  static const _cloudName = 'ddy9wgrbj';
+  static const _uploadPreset = 'musicapp';
+  static const musicFolder = 'music';
+
   final _db = FirebaseFirestore.instance;
 
   // ── Cloudinary: upload ảnh, trả về URL ──
   Future<String> uploadImage(String localPath) async {
-    const cloudName = 'ddy9wgrbj'; // 👈 thay bằng Cloud Name của bạn
-    const uploadPreset = 'musicapp'; // 👈 thay bằng tên upload preset
+    final multipartFile = await http.MultipartFile.fromPath('file', localPath);
 
-    final uri = Uri.parse(
-      'https://api.cloudinary.com/v1_1/$cloudName/image/upload',
+    return _uploadFile(
+      resourceType: 'image',
+      file: multipartFile,
+      folderPath: musicFolder,
     );
-    final request = http.MultipartRequest('POST', uri)
-      ..fields['upload_preset'] = uploadPreset
-      ..files.add(await http.MultipartFile.fromPath('file', localPath));
-
-    final response = await request.send();
-    final body = await response.stream.bytesToString();
-    final json = jsonDecode(body);
-
-    return json['secure_url']; // URL ảnh trả về
   }
+
   // ── Cloudinary: upload audio, trả về URL ──
   Future<String> uploadAudio(String localPath) async {
-    const cloudName = 'YOUR_CLOUD_NAME'; // 👈 thay bằng Cloud Name của bạn
-    const uploadPreset = 'musicapp'; // 👈 thay bằng tên upload preset
+    final multipartFile = await http.MultipartFile.fromPath('file', localPath);
 
-    // Cloudinary dùng resource_type 'video' cho cả audio lẫn video
+    return _uploadFile(
+      resourceType: 'video',
+      file: multipartFile,
+      folderPath: musicFolder,
+    );
+  }
+
+  Future<String> _uploadFile({
+    required String resourceType,
+    required http.MultipartFile file,
+    required String folderPath,
+  }) async {
     final uri = Uri.parse(
-      'https://api.cloudinary.com/v1_1/$cloudName/video/upload',
+      'https://api.cloudinary.com/v1_1/$_cloudName/$resourceType/upload',
     );
     final request = http.MultipartRequest('POST', uri)
-      ..fields['upload_preset'] = uploadPreset
-      ..files.add(await http.MultipartFile.fromPath('file', localPath));
+      ..fields['upload_preset'] = _uploadPreset
+      ..fields['folder'] = folderPath
+      ..fields['asset_folder'] = folderPath
+      ..fields['public_id_prefix'] = folderPath
+      ..files.add(file);
 
     final response = await request.send();
     final body = await response.stream.bytesToString();
-    final json = jsonDecode(body);
+    final json = jsonDecode(body) as Map<String, dynamic>;
 
-    return json['secure_url']; // URL audio trả về
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      final errorMessage =
+          (json['error'] as Map<String, dynamic>?)?['message']?.toString() ??
+          'Upload Cloudinary thất bại';
+      throw Exception(errorMessage);
+    }
+
+    final secureUrl = json['secure_url']?.toString();
+    if (secureUrl == null || secureUrl.isEmpty) {
+      throw Exception('Cloudinary không trả về secure_url');
+    }
+
+    return secureUrl;
   }
 
   // ── Firestore: thêm bài hát ──
