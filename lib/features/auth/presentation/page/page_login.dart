@@ -4,8 +4,7 @@ import 'package:login_flutter/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:login_flutter/features/auth/presentation/bloc/auth_event.dart';
 import 'package:login_flutter/features/auth/presentation/bloc/auth_state.dart';
 import 'package:login_flutter/features/auth/presentation/page/page_signup.dart';
-
-import 'package:login_flutter/features/discover/presentation/pages/discover_page.dart';
+import 'package:login_flutter/features/home/presentation/pages/home_page.dart';
 
 class LoginWidget extends StatefulWidget {
   const LoginWidget({super.key});
@@ -47,7 +46,7 @@ class _LoginWidgetState extends State<LoginWidget> {
             );
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const DiscoverPage()),
+              MaterialPageRoute(builder: (context) => const HomePage()),
             );
           }
         },
