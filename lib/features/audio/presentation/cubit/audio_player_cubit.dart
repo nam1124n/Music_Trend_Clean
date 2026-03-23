@@ -18,9 +18,14 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       final processingState = playerState.processingState;
 
       if (processingState == ProcessingState.completed) {
-        emit(state.copyWith(isPlaying: false, position: Duration.zero));
-        _audioPlayer.seek(Duration.zero);
-        _audioPlayer.pause();
+        // Auto play next song if possible
+        if (state.playlist.isNotEmpty && state.currentIndex < state.playlist.length - 1) {
+          next();
+        } else {
+          emit(state.copyWith(isPlaying: false, position: Duration.zero));
+          _audioPlayer.seek(Duration.zero);
+          _audioPlayer.pause();
+        }
       } else {
         emit(state.copyWith(
           isPlaying: isPlaying,
@@ -40,9 +45,13 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
 
   Future<void> playSong(SongEntity song, {List<SongEntity>? playlist}) async {
     try {
+      final currentPlaylist = playlist ?? state.playlist;
+      final index = currentPlaylist.indexWhere((s) => s.id == song.id);
+
       emit(state.copyWith(
         currentSong: song,
-        playlist: playlist ?? state.playlist,
+        playlist: currentPlaylist,
+        currentIndex: index != -1 ? index : 0,
         isLoading: true,
         isError: false,
       ));
@@ -64,6 +73,33 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
 
   void seek(Duration position) {
     _audioPlayer.seek(position);
+  }
+
+  Future<void> next() async {
+    if (state.playlist.isEmpty) return;
+    
+    final nextIndex = state.currentIndex + 1;
+    if (nextIndex < state.playlist.length) {
+      final nextSong = state.playlist[nextIndex];
+      await playSong(nextSong, playlist: state.playlist);
+    }
+  }
+
+  Future<void> previous() async {
+    if (state.playlist.isEmpty) return;
+
+    if (state.position.inSeconds > 3) {
+      // If played more than 3 seconds, previous goes to start of current song
+      await _audioPlayer.seek(Duration.zero);
+    } else {
+      final prevIndex = state.currentIndex - 1;
+      if (prevIndex >= 0) {
+        final prevSong = state.playlist[prevIndex];
+        await playSong(prevSong, playlist: state.playlist);
+      } else {
+        await _audioPlayer.seek(Duration.zero);
+      }
+    }
   }
 
   @override

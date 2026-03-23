@@ -9,6 +9,7 @@ class AudioPlayerState extends Equatable {
   final Duration position;
   final Duration duration;
   final List<SongEntity> playlist;
+  final int currentIndex;
 
   const AudioPlayerState({
     this.currentSong,
@@ -18,6 +19,7 @@ class AudioPlayerState extends Equatable {
     this.position = Duration.zero,
     this.duration = Duration.zero,
     this.playlist = const [],
+    this.currentIndex = -1,
   });
 
   AudioPlayerState copyWith({
@@ -28,6 +30,7 @@ class AudioPlayerState extends Equatable {
     Duration? position,
     Duration? duration,
     List<SongEntity>? playlist,
+    int? currentIndex,
   }) {
     return AudioPlayerState(
       currentSong: currentSong ?? this.currentSong,
@@ -37,6 +40,7 @@ class AudioPlayerState extends Equatable {
       position: position ?? this.position,
       duration: duration ?? this.duration,
       playlist: playlist ?? this.playlist,
+      currentIndex: currentIndex ?? this.currentIndex,
     );
   }
 
@@ -49,5 +53,6 @@ class AudioPlayerState extends Equatable {
         position,
         duration,
         playlist,
+        currentIndex,
       ];
 }

@@ -81,8 +81,14 @@ class MiniPlayer extends StatelessWidget {
               IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.skip_previous, color: Colors.white, size: 24),
-                onPressed: () {},
+                icon: Icon(
+                  Icons.skip_previous,
+                  color: state.currentIndex > 0 || state.position.inSeconds > 3 ? Colors.white : Colors.white38,
+                  size: 24,
+                ),
+                onPressed: () {
+                  context.read<AudioPlayerCubit>().previous();
+                },
               ),
               const SizedBox(width: 16),
               GestureDetector(
@@ -116,8 +122,14 @@ class MiniPlayer extends StatelessWidget {
               IconButton(
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
-                icon: const Icon(Icons.skip_next, color: Colors.white, size: 24),
-                onPressed: () {},
+                icon: Icon(
+                  Icons.skip_next,
+                  color: state.currentIndex < state.playlist.length - 1 ? Colors.white : Colors.white38,
+                  size: 24,
+                ),
+                onPressed: () {
+                  context.read<AudioPlayerCubit>().next();
+                },
               ),
               const SizedBox(width: 8),
             ],
