@@ -1,3 +1,4 @@
+import 'package:image_picker/image_picker.dart';
 import 'package:login_flutter/features/admin/domain/entities/song_entity.dart';
 import 'package:login_flutter/features/admin/domain/repositories/song_repository.dart';
 import 'package:login_flutter/features/admin/data/datasources/song_remote_data_source.dart';
@@ -22,12 +23,12 @@ class SongRepositoryImpl implements SongRepository {
   @override
   Future<void> addSong(
     SongEntity song,
-    String localImagePath,
-    String localAudioPath,
+    XFile imageFile,
+    XFile audioFile,
   ) async {
     final results = await Future.wait([
-      remoteDataSource.uploadImage(localImagePath),
-      remoteDataSource.uploadAudio(localAudioPath),
+      remoteDataSource.uploadImage(imageFile.path),
+      remoteDataSource.uploadAudio(audioFile.path),
     ]);
     final imageUrl = results[0];
     final audioUrl = results[1];

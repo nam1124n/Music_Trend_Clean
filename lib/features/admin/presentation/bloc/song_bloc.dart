@@ -32,7 +32,7 @@ class SongBloc extends Bloc<SongEvent, SongState> {
   Future<void> _onAdd(AddSongEvent event, Emitter<SongState> emit) async {
     emit(SongLoading());
     try {
-      await addSongUseCase(event.song, event.localImagePath, event.localAudioPath);
+      await addSongUseCase(event.song, event.imageFile, event.audioFile);
       emit(SongActionSuccess());
     } catch (e) {
       emit(SongError(e.toString()));

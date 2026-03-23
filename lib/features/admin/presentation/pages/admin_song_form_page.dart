@@ -1,7 +1,8 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:login_flutter/core/utils/audio_file_picker.dart';
 import 'package:login_flutter/features/admin/domain/entities/song_entity.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_bloc.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_event.dart';
@@ -17,10 +18,11 @@ class AdminSongFormPage extends StatefulWidget {
 
 class _AdminSongFormPageState extends State<AdminSongFormPage> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController  = TextEditingController();
+  final _titleController = TextEditingController();
   final _artistController = TextEditingController();
 
   XFile? _pickedImage;
+  Uint8List? _pickedImageBytes;
   XFile? _pickedAudio;
   final _picker = ImagePicker();
 
@@ -33,12 +35,21 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
 
   Future<void> _pickImage() async {
     final file = await _picker.pickImage(source: ImageSource.gallery);
-    if (file != null) setState(() => _pickedImage = file);
+    if (file == null) return;
+
+    final bytes = await file.readAsBytes();
+    if (!mounted) return;
+
+    setState(() {
+      _pickedImage = file;
+      _pickedImageBytes = bytes;
+    });
   }
 
   Future<void> _pickAudio() async {
-    final file = await _picker.pickMedia();
-    if (file != null) setState(() => _pickedAudio = file);
+    final file = await pickAudioFile();
+    if (file == null || !mounted) return;
+    setState(() => _pickedAudio = file);
   }
 
   void _submit() {
@@ -46,14 +57,20 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
 
     if (_pickedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng chọn ảnh bìa!'), backgroundColor: Colors.orange),
+        const SnackBar(
+          content: Text('Vui lòng chọn ảnh bìa!'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
 
     if (_pickedAudio == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng chọn file audio!'), backgroundColor: Colors.orange),
+        const SnackBar(
+          content: Text('Vui lòng chọn file audio!'),
+          backgroundColor: Colors.orange,
+        ),
       );
       return;
     }
@@ -67,7 +84,7 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
     );
 
     context.read<SongBloc>().add(
-      AddSongEvent(song, _pickedImage!.path, _pickedAudio!.path),
+      AddSongEvent(song, _pickedImage!, _pickedAudio!),
     );
   }
 
@@ -90,7 +107,10 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
             Navigator.pop(context);
           } else if (state is SongError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Lỗi: ${state.message}'), backgroundColor: Colors.red),
+              SnackBar(
+                content: Text('Lỗi: ${state.message}'),
+                backgroundColor: Colors.red,
+              ),
             );
           }
         },
@@ -122,11 +142,11 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                             width: 2,
                           ),
                         ),
-                        child: _pickedImage != null
+                        child: _pickedImageBytes != null
                             ? ClipRRect(
                                 borderRadius: BorderRadius.circular(14),
-                                child: Image.file(
-                                  File(_pickedImage!.path),
+                                child: Image.memory(
+                                  _pickedImageBytes!,
                                   fit: BoxFit.cover,
                                   width: double.infinity,
                                 ),
@@ -134,11 +154,16 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                             : Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.add_photo_alternate_outlined,
-                                      size: 48, color: Colors.grey[400]),
+                                  Icon(
+                                    Icons.add_photo_alternate_outlined,
+                                    size: 48,
+                                    color: Colors.grey[400],
+                                  ),
                                   const SizedBox(height: 8),
-                                  Text('Chọn ảnh bìa',
-                                      style: TextStyle(color: Colors.grey[500])),
+                                  Text(
+                                    'Chọn ảnh bìa',
+                                    style: TextStyle(color: Colors.grey[500]),
+                                  ),
                                 ],
                               ),
                       ),
@@ -151,7 +176,10 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                     GestureDetector(
                       onTap: isLoading ? null : _pickAudio,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 20,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(16),
@@ -165,7 +193,9 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                         child: Row(
                           children: [
                             Icon(
-                              _pickedAudio != null ? Icons.audio_file : Icons.upload_file,
+                              _pickedAudio != null
+                                  ? Icons.audio_file
+                                  : Icons.upload_file,
                               color: _pickedAudio != null
                                   ? const Color(0xFF8C52FF)
                                   : Colors.grey[400],
@@ -178,7 +208,9 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                                     ? _pickedAudio!.name
                                     : 'Nhấn để chọn file âm thanh',
                                 style: TextStyle(
-                                  color: _pickedAudio != null ? Colors.black87 : Colors.grey[500],
+                                  color: _pickedAudio != null
+                                      ? Colors.black87
+                                      : Colors.grey[500],
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -196,8 +228,9 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                       controller: _titleController,
                       enabled: !isLoading,
                       decoration: _inputDeco('Ví dụ: Hoa Nở Không Màu'),
-                      validator: (v) =>
-                          v == null || v.trim().isEmpty ? 'Vui lòng nhập tên bài hát' : null,
+                      validator: (v) => v == null || v.trim().isEmpty
+                          ? 'Vui lòng nhập tên bài hát'
+                          : null,
                     ),
                     const SizedBox(height: 20),
 
@@ -208,8 +241,9 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
                       controller: _artistController,
                       enabled: !isLoading,
                       decoration: _inputDeco('Ví dụ: Hoài Lâm'),
-                      validator: (v) =>
-                          v == null || v.trim().isEmpty ? 'Vui lòng nhập tên nghệ sĩ' : null,
+                      validator: (v) => v == null || v.trim().isEmpty
+                          ? 'Vui lòng nhập tên nghệ sĩ'
+                          : null,
                     ),
                     const SizedBox(height: 36),
 
@@ -262,28 +296,26 @@ class _AdminSongFormPageState extends State<AdminSongFormPage> {
   }
 
   InputDecoration _inputDeco(String hint) => InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey[400]),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.grey.shade300),
-        ),
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(16)),
-          borderSide: BorderSide(color: Color(0xFF8C52FF), width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.red),
-        ),
-      );
+    hintText: hint,
+    hintStyle: TextStyle(color: Colors.grey[400]),
+    filled: true,
+    fillColor: Colors.white,
+    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(color: Colors.grey.shade300),
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16),
+      borderSide: BorderSide(color: Colors.grey.shade300),
+    ),
+    focusedBorder: const OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(16)),
+      borderSide: BorderSide(color: Color(0xFF8C52FF), width: 1.5),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(16),
+      borderSide: const BorderSide(color: Colors.red),
+    ),
+  );
 }
-
-
