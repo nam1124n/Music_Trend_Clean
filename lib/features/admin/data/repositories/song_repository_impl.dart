@@ -27,8 +27,8 @@ class SongRepositoryImpl implements SongRepository {
     XFile audioFile,
   ) async {
     final results = await Future.wait([
-      remoteDataSource.uploadImage(imageFile.path),
-      remoteDataSource.uploadAudio(audioFile.path),
+      remoteDataSource.uploadImage(imageFile),
+      remoteDataSource.uploadAudio(audioFile),
     ]);
     final imageUrl = results[0];
     final audioUrl = results[1];
