@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:login_flutter/features/admin/domain/entities/song_entity.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_bloc.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_state.dart';
+import 'package:login_flutter/features/audio/presentation/cubit/audio_player_cubit.dart';
+import 'package:login_flutter/features/audio/presentation/cubit/audio_player_state.dart';
 
 class SuggestionsTab extends StatelessWidget {
   const SuggestionsTab({super.key});
@@ -272,10 +274,40 @@ class SuggestionsTab extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Icon(
-                Icons.play_circle_outline,
-                color: Colors.grey.shade300,
-                size: 24,
+              BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
+                builder: (context, playerState) {
+                  final isPlayingThisSong = playerState.currentSong?.id == song.id && playerState.isPlaying;
+                  final isLoadingThisSong = playerState.currentSong?.id == song.id && playerState.isLoading;
+
+                  return GestureDetector(
+                    onTap: () {
+                      if (isPlayingThisSong) {
+                        context.read<AudioPlayerCubit>().pause();
+                      } else if (playerState.currentSong?.id == song.id) {
+                        context.read<AudioPlayerCubit>().resume();
+                      } else {
+                        context.read<AudioPlayerCubit>().playSong(song, playlist: songs);
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      child: isLoadingThisSong
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Color(0xFF8C52FF),
+                              ),
+                            )
+                          : Icon(
+                              isPlayingThisSong ? Icons.pause_circle_outline : Icons.play_circle_outline,
+                              color: isPlayingThisSong ? const Color(0xFF8C52FF) : Colors.grey.shade400,
+                              size: 28,
+                            ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

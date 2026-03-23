@@ -20,6 +20,7 @@ import 'package:login_flutter/features/admin/domain/usecase/get_songs_usecase.da
 import 'package:login_flutter/features/admin/domain/usecase/add_song_usecase.dart';
 import 'package:login_flutter/features/admin/domain/usecase/delete_song_usecase.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_bloc.dart';
+import 'package:login_flutter/features/audio/presentation/cubit/audio_player_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,6 +54,9 @@ void main() async {
             addSongUseCase: addSongUseCase,
             deleteSongUseCase: deleteSongUseCase,
           ),
+        ),
+        BlocProvider<AudioPlayerCubit>(
+          create: (_) => AudioPlayerCubit(),
         ),
       ],
       child: const MaterialApp(

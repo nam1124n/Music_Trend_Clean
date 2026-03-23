@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:login_flutter/features/audio/presentation/cubit/audio_player_cubit.dart';
+import 'package:login_flutter/features/audio/presentation/cubit/audio_player_state.dart';
 
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFF8C52FF),
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
+      builder: (context, state) {
+        if (state.currentSong == null) {
+          return const SizedBox.shrink(); // Hide if no song is playing
+        }
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF8C52FF),
+            borderRadius: BorderRadius.circular(16),
+          ),
       child: Row(
         children: [
           // Album Art Placeholder
@@ -21,9 +30,20 @@ class MiniPlayer extends StatelessWidget {
               color: Colors.black87,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Center(
-              child: Icon(Icons.music_note, color: Colors.white54, size: 20),
-            ),
+            child: state.currentSong!.imageUrl.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      state.currentSong!.imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Center(
+                        child: Icon(Icons.music_note, color: Colors.white54, size: 20),
+                      ),
+                    ),
+                  )
+                : const Center(
+                    child: Icon(Icons.music_note, color: Colors.white54, size: 20),
+                  ),
           ),
           const SizedBox(width: 12),
           // Song Info
@@ -32,9 +52,9 @@ class MiniPlayer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  "Electric Dreams",
-                  style: TextStyle(
+                Text(
+                  state.currentSong!.title,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -43,7 +63,7 @@ class MiniPlayer extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  "Synthesize",
+                  state.currentSong!.artist,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 12,
@@ -65,13 +85,32 @@ class MiniPlayer extends StatelessWidget {
                 onPressed: () {},
               ),
               const SizedBox(width: 16),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.3),
-                  shape: BoxShape.circle,
+              GestureDetector(
+                onTap: () {
+                  if (state.isPlaying) {
+                    context.read<AudioPlayerCubit>().pause();
+                  } else {
+                    context.read<AudioPlayerCubit>().resume();
+                  }
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(6),
+                  child: state.isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Icon(
+                          state.isPlaying ? Icons.pause : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                 ),
-                padding: const EdgeInsets.all(6),
-                child: const Icon(Icons.pause, color: Colors.white, size: 20),
               ),
               const SizedBox(width: 16),
               IconButton(
@@ -83,8 +122,10 @@ class MiniPlayer extends StatelessWidget {
               const SizedBox(width: 8),
             ],
           ),
-        ],
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
