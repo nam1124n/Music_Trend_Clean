@@ -21,7 +21,8 @@ import 'package:login_flutter/features/admin/domain/usecase/add_song_usecase.dar
 import 'package:login_flutter/features/admin/domain/usecase/delete_song_usecase.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_bloc.dart';
 import 'package:login_flutter/features/audio/presentation/cubit/audio_player_cubit.dart';
-
+import 'package:login_flutter/features/discover/presentation/bloc/favorite_cubit.dart';
+import 'package:login_flutter/features/discover/presentation/bloc/recent_cubit.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -57,6 +58,12 @@ void main() async {
         ),
         BlocProvider<AudioPlayerCubit>(
           create: (_) => AudioPlayerCubit(),
+        ),
+        BlocProvider<FavoriteCubit>(
+          create: (_) => FavoriteCubit(),
+        ),
+        BlocProvider<RecentCubit>(
+          create: (_) => RecentCubit(),
         ),
       ],
       child: const MaterialApp(

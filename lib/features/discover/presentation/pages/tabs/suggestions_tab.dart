@@ -5,7 +5,8 @@ import 'package:login_flutter/features/admin/presentation/bloc/song_bloc.dart';
 import 'package:login_flutter/features/admin/presentation/bloc/song_state.dart';
 import 'package:login_flutter/features/audio/presentation/cubit/audio_player_cubit.dart';
 import 'package:login_flutter/features/audio/presentation/cubit/audio_player_state.dart';
-
+import 'package:login_flutter/features/discover/presentation/bloc/favorite_cubit.dart';
+import 'package:login_flutter/features/discover/presentation/bloc/recent_cubit.dart';
 class SuggestionsTab extends StatelessWidget {
   const SuggestionsTab({super.key});
 
@@ -209,6 +210,19 @@ class SuggestionsTab extends StatelessWidget {
           ),
           child: Row(
             children: [
+              SizedBox(
+                width: 24,
+                child: Text(
+                  '${index + 1}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey.shade500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(width: 8),
               Container(
                 width: 56,
                 height: 56,
@@ -274,6 +288,24 @@ class SuggestionsTab extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
+              BlocBuilder<FavoriteCubit, List<SongEntity>>(
+                builder: (context, favoriteSongs) {
+                  final isFavorite = favoriteSongs.any((s) => s.id == song.id);
+                  return GestureDetector(
+                    onTap: () {
+                      context.read<FavoriteCubit>().toggleFavorite(song);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? const Color(0xFFF43F5E) : Colors.grey.shade400,
+                        size: 24,
+                      ),
+                    ),
+                  );
+                },
+              ),
               BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
                 builder: (context, playerState) {
                   final isPlayingThisSong = playerState.currentSong?.id == song.id && playerState.isPlaying;
@@ -287,6 +319,7 @@ class SuggestionsTab extends StatelessWidget {
                         context.read<AudioPlayerCubit>().resume();
                       } else {
                         context.read<AudioPlayerCubit>().playSong(song, playlist: songs);
+                        context.read<RecentCubit>().addRecent(song);
                       }
                     },
                     child: Container(

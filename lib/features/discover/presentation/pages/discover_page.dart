@@ -7,6 +7,8 @@ import '../widgets/discover_app_bar.dart';
 import '../widgets/discover_tab_bar.dart';
 import 'tabs/suggestions_tab.dart';
 import 'tabs/your_audio_tab.dart';
+import 'tabs/favorites_tab.dart';
+import 'tabs/recents_tab.dart';
 
 class DiscoverPage extends StatelessWidget {
   const DiscoverPage({super.key});
@@ -57,8 +59,8 @@ class _DiscoverContentState extends State<DiscoverContent>
               controller: _tabController,
               children: [
                 const SuggestionsTab(),
-                const Center(child: Text('Yêu thích')),
-                const Center(child: Text('Gần đây')),
+                const FavoritesTab(),
+                const RecentsTab(),
                 const YourAudioTab(),
               ],
             ),
