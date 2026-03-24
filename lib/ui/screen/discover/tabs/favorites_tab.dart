@@ -1,0 +1,168 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:login_flutter/domain/entities/song_entity.dart';
+import 'package:login_flutter/ui/screen/audio/cubit/audio_player_cubit.dart';
+import 'package:login_flutter/ui/screen/audio/cubit/audio_player_state.dart';
+import 'package:login_flutter/ui/screen/discover/bloc/favorite_cubit.dart';
+import 'package:login_flutter/ui/screen/discover/bloc/recent_cubit.dart';
+
+class FavoritesTab extends StatelessWidget {
+  const FavoritesTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<FavoriteCubit, List<SongEntity>>(
+      builder: (context, favoriteSongs) {
+        if (favoriteSongs.isEmpty) {
+          return Center(
+            child: Text(
+              'Chưa có bài hát yêu thích nào',
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+            ),
+          );
+        }
+        return ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          itemCount: favoriteSongs.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final song = favoriteSongs[index];
+            return _buildSongItem(context, song, favoriteSongs);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildSongItem(BuildContext context, SongEntity song, List<SongEntity> playlist) {
+    final Color cardColor = const Color(0xFF8C52FF);
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade100, width: 1),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: cardColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: song.imageUrl.isNotEmpty
+                ? Image.network(
+                    song.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => const Icon(
+                      Icons.music_note,
+                      color: Colors.white54,
+                      size: 28,
+                    ),
+                  )
+                : const Icon(Icons.music_note, color: Colors.white54, size: 28),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  song.title,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: Colors.black87,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    const Icon(Icons.music_note, size: 14, color: Color(0xFF8C52FF)),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        song.artist,
+                        style: const TextStyle(
+                          color: Color(0xFF8C52FF),
+                          fontSize: 13,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Nút trái tim (Yêu thích)
+          GestureDetector(
+            onTap: () {
+              context.read<FavoriteCubit>().toggleFavorite(song);
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.favorite,
+                color: Color(0xFF8C52FF),
+                size: 24,
+              ),
+            ),
+          ),
+          // Nút Play
+          BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
+            builder: (context, playerState) {
+              final isPlayingThisSong = playerState.currentSong?.id == song.id && playerState.isPlaying;
+              final isLoadingThisSong = playerState.currentSong?.id == song.id && playerState.isLoading;
+
+              return GestureDetector(
+                onTap: () {
+                  if (isPlayingThisSong) {
+                    context.read<AudioPlayerCubit>().pause();
+                  } else if (playerState.currentSong?.id == song.id) {
+                    context.read<AudioPlayerCubit>().resume();
+                  } else {
+                    context.read<AudioPlayerCubit>().playSong(song, playlist: playlist);
+                    context.read<RecentCubit>().addRecent(song);
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: isLoadingThisSong
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Color(0xFF8C52FF),
+                          ),
+                        )
+                      : Icon(
+                          isPlayingThisSong ? Icons.pause_circle_outline : Icons.play_circle_outline,
+                          color: isPlayingThisSong ? const Color(0xFF8C52FF) : Colors.grey.shade400,
+                          size: 28,
+                        ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
