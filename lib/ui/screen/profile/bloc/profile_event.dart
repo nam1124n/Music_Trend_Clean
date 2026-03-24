@@ -17,3 +17,12 @@ class UpdateAvatarEvent extends ProfileEvent {
   @override
   List<Object> get props => [imagePath];
 }
+
+class UpdateProfileInfoEvent extends ProfileEvent {
+  final String username;
+
+  const UpdateProfileInfoEvent({required this.username});
+
+  @override
+  List<Object> get props => [username];
+}

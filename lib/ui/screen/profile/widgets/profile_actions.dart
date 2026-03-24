@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:login_flutter/domain/entities/profile_entity.dart';
+import 'package:login_flutter/ui/screen/profile/bloc/profile_bloc.dart';
+import 'package:login_flutter/ui/screen/profile/edit_profile_screen.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ProfileActions extends StatelessWidget {
+  final ProfileEntity profile;
   final Color primaryColor;
   final Color textPrimary;
 
   const ProfileActions({
     super.key,
+    required this.profile,
     required this.primaryColor,
     required this.textPrimary,
   });
@@ -36,7 +43,18 @@ class ProfileActions extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(18),
-                onTap: () {},
+                onTap: () {
+                  final bloc = context.read<ProfileBloc>();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider.value(
+                        value: bloc,
+                        child: EditProfileScreen(currentProfile: profile),
+                      ),
+                    ),
+                  );
+                },
                 child: const Center(
                   child: Text(
                     'Edit Profile',
@@ -70,7 +88,12 @@ class ProfileActions extends StatelessWidget {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(18),
-                onTap: () {},
+                onTap: () {
+                  final shareText = 'Check out ${profile.username}\'s beautiful profile on Music Trend App! '
+                      'They already have ${profile.followers} followers.\n'
+                      'Download the app to listen to great music together!';
+                  Share.share(shareText);
+                },
                 child: Center(
                   child: Text(
                     'Share',

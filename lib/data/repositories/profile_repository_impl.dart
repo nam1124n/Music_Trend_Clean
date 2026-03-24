@@ -21,4 +21,9 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<void> updateAvatarUrl(String url) async {
     await remoteDataSource.updateAvatarUrl(url);
   }
+
+  @override
+  Future<void> updateProfile(String username) async {
+    await remoteDataSource.updateProfile(username);
+  }
 }

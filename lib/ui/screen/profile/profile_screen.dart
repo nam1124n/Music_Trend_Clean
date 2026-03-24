@@ -7,6 +7,7 @@ import 'package:login_flutter/data/datasource/remote/profile_remote_data_source.
 import 'package:login_flutter/data/repositories/profile_repository_impl.dart';
 import 'package:login_flutter/domain/usecases/get_profile_usecase.dart';
 import 'package:login_flutter/domain/usecases/update_avatar_usecase.dart';
+import 'package:login_flutter/domain/usecases/update_profile_usecase.dart';
 import 'package:login_flutter/ui/screen/profile/bloc/profile_bloc.dart';
 import 'package:login_flutter/ui/screen/profile/bloc/profile_event.dart';
 import 'package:login_flutter/ui/screen/profile/bloc/profile_state.dart';
@@ -34,6 +35,7 @@ class ProfileScreen extends StatelessWidget {
         return ProfileBloc(
           getProfileUseCase: GetProfileUseCase(repository),
           updateAvatarUseCase: UpdateAvatarUseCase(repository),
+          updateProfileUseCase: UpdateProfileUseCase(repository),
         )..add(FetchProfileEvent());
       },
       child: const Scaffold(
@@ -89,7 +91,8 @@ class ProfileContent extends StatelessWidget {
                           textMuted: ProfileScreen._textMuted,
                         ),
                         const SizedBox(height: 22),
-                        const ProfileActions(
+                        ProfileActions(
+                          profile: profile,
                           primaryColor: ProfileScreen._primary,
                           textPrimary: ProfileScreen._textPrimary,
                         ),

@@ -1,0 +1,113 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:login_flutter/domain/entities/profile_entity.dart';
+import 'package:login_flutter/ui/screen/profile/bloc/profile_bloc.dart';
+import 'package:login_flutter/ui/screen/profile/bloc/profile_event.dart';
+
+class EditProfileScreen extends StatefulWidget {
+  final ProfileEntity currentProfile;
+
+  const EditProfileScreen({super.key, required this.currentProfile});
+
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  late TextEditingController _usernameController;
+
+  @override
+  void initState() {
+    super.initState();
+    _usernameController = TextEditingController(text: widget.currentProfile.username);
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    super.dispose();
+  }
+
+  void _saveProfile() {
+    final newUsername = _usernameController.text.trim();
+    if (newUsername.isNotEmpty && newUsername != widget.currentProfile.username) {
+      context.read<ProfileBloc>().add(UpdateProfileInfoEvent(username: newUsername));
+    }
+    Navigator.pop(context); // Trở về ngay lập tức, màn hình Profile sẽ tự load state mới
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF7F3FB),
+      appBar: AppBar(
+        title: const Text('Edit Profile'),
+        backgroundColor: Colors.transparent,
+        foregroundColor: const Color(0xFF20202B),
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Change Username',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF20202B).withValues(alpha: 0.8),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: _usernameController,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Enter your username',
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFA066FF), width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: _saveProfile,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  backgroundColor: const Color(0xFFA066FF),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 2,
+                ),
+                child: const Text(
+                  'Save Changes',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.1,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
