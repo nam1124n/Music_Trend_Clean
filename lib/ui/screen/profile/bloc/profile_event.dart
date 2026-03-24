@@ -8,3 +8,12 @@ abstract class ProfileEvent extends Equatable {
 }
 
 class FetchProfileEvent extends ProfileEvent {}
+
+class UpdateAvatarEvent extends ProfileEvent {
+  final String imagePath;
+
+  const UpdateAvatarEvent({required this.imagePath});
+
+  @override
+  List<Object> get props => [imagePath];
+}

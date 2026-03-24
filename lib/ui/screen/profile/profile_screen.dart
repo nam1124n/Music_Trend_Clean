@@ -3,9 +3,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:login_flutter/data/datasource/local/profile_local_data_source.dart';
+import 'package:login_flutter/data/datasource/remote/profile_remote_data_source.dart';
 import 'package:login_flutter/data/repositories/profile_repository_impl.dart';
 import 'package:login_flutter/domain/usecases/get_profile_usecase.dart';
+import 'package:login_flutter/domain/usecases/update_avatar_usecase.dart';
 import 'package:login_flutter/ui/screen/profile/bloc/profile_bloc.dart';
 import 'package:login_flutter/ui/screen/profile/bloc/profile_event.dart';
 import 'package:login_flutter/ui/screen/profile/bloc/profile_state.dart';
@@ -26,13 +27,15 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ProfileBloc(
-        getProfileUseCase: GetProfileUseCase(
-          ProfileRepositoryImpl(
-            localDataSource: ProfileLocalDataSourceImpl(),
-          ),
-        ),
-      )..add(FetchProfileEvent()),
+      create: (context) {
+        final repository = ProfileRepositoryImpl(
+          remoteDataSource: ProfileRemoteDataSourceImpl(),
+        );
+        return ProfileBloc(
+          getProfileUseCase: GetProfileUseCase(repository),
+          updateAvatarUseCase: UpdateAvatarUseCase(repository),
+        )..add(FetchProfileEvent());
+      },
       child: const Scaffold(
         backgroundColor: _background,
         body: ProfileContent(),

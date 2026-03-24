@@ -17,6 +17,24 @@ class ProfileEntity extends Equatable {
     required this.likes,
   });
 
+  ProfileEntity copyWith({
+    String? username,
+    String? id,
+    String? avatarUrl,
+    int? followers,
+    int? following,
+    int? likes,
+  }) {
+    return ProfileEntity(
+      username: username ?? this.username,
+      id: id ?? this.id,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      followers: followers ?? this.followers,
+      following: following ?? this.following,
+      likes: likes ?? this.likes,
+    );
+  }
+
   @override
   List<Object?> get props => [
         username,
