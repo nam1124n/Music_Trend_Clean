@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:login_flutter/ui/screen/admin/bloc/song_bloc.dart';
-import 'package:login_flutter/ui/screen/admin/bloc/song_event.dart';
 
 import 'package:login_flutter/ui/screen/discover/widgets/discover_app_bar.dart';
 import 'package:login_flutter/ui/screen/discover/widgets/discover_tab_bar.dart';
@@ -37,7 +34,6 @@ class _DiscoverContentState extends State<DiscoverContent>
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
-    context.read<SongBloc>().add(LoadSongsEvent());
   }
 
   @override

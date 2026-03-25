@@ -89,10 +89,11 @@ class ProfileActions extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(18),
                 onTap: () {
-                  final shareText = 'Check out ${profile.username}\'s beautiful profile on Music Trend App! '
+                  final shareText =
+                      'Check out ${profile.username}\'s beautiful profile on Music Trend App! '
                       'They already have ${profile.followers} followers.\n'
                       'Download the app to listen to great music together!';
-                  Share.share(shareText);
+                  SharePlus.instance.share(ShareParams(text: shareText));
                 },
                 child: Center(
                   child: Text(

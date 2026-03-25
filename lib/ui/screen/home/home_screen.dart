@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:login_flutter/ui/screen/admin/bloc/song_bloc.dart';
+import 'package:login_flutter/ui/screen/admin/bloc/song_event.dart';
 import 'package:login_flutter/ui/screen/audio/cubit/audio_player_cubit.dart';
 import 'package:login_flutter/ui/screen/audio/cubit/audio_player_state.dart';
 import 'package:login_flutter/ui/screen/discover/discover_screen.dart';
 import 'package:login_flutter/ui/screen/discover/widgets/custom_bottom_nav.dart';
 import 'package:login_flutter/ui/screen/discover/widgets/mini_player.dart';
 import 'package:login_flutter/ui/screen/profile/profile_screen.dart';
+import 'package:login_flutter/ui/screen/search/search_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,6 +31,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    context.read<SongBloc>().add(LoadSongsEvent());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -35,11 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _currentIndex,
         children: const [
           DiscoverContent(),
-          _PlaceholderTab(
-            icon: Icons.search_rounded,
-            title: 'Tìm kiếm',
-            description: 'Khu vực tìm kiếm sẽ hiển thị tại đây.',
-          ),
+          SearchScreen(),
           _PlaceholderTab(
             icon: Icons.favorite_rounded,
             title: 'Đã thích',

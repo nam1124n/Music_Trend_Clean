@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:login_flutter/data/datasource/remote/ollama_ai_remote_data_source.dart';
+import 'package:login_flutter/data/repositories/ai_search_repository_impl.dart';
+import 'package:login_flutter/domain/usecases/analyze_search_query_usecase.dart';
 import 'package:login_flutter/firebase_options.dart';
 
 // Auth
@@ -25,6 +28,8 @@ import 'package:login_flutter/ui/screen/admin/bloc/song_bloc.dart';
 import 'package:login_flutter/ui/screen/audio/cubit/audio_player_cubit.dart';
 import 'package:login_flutter/ui/screen/discover/bloc/favorite_cubit.dart';
 import 'package:login_flutter/ui/screen/discover/bloc/recent_cubit.dart';
+import 'package:login_flutter/ui/screen/search/cubit/search_cubit.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -32,24 +37,35 @@ void main() async {
   // ── Auth DI ──
   final authDataSource = AuthRemoteDataSourceImpl();
   final authRepository = AuthRepositoryImpl(authDataSource);
-  final loginUseCase   = LoginUseCase(authRepository);
-  final signUpUseCase  = SignUpUseCase(authRepository);
+  final loginUseCase = LoginUseCase(authRepository);
+  final signUpUseCase = SignUpUseCase(authRepository);
 
   // ── Song DI ──
-  final songDataSource    = SongRemoteDataSource();
-  final songRepository    = SongRepositoryImpl(songDataSource);
-  final getSongsUseCase   = GetSongsUseCase(songRepository);
-  final addSongUseCase    = AddSongUseCase(songRepository);
+  final songDataSource = SongRemoteDataSource();
+  final songRepository = SongRepositoryImpl(songDataSource);
+  final getSongsUseCase = GetSongsUseCase(songRepository);
+  final addSongUseCase = AddSongUseCase(songRepository);
   final deleteSongUseCase = DeleteSongUseCase(songRepository);
-  final getWeeklyTrendingSongsUseCase =
-      GetWeeklyTrendingSongsUseCase(songRepository);
+  final getWeeklyTrendingSongsUseCase = GetWeeklyTrendingSongsUseCase(
+    songRepository,
+  );
   final trackSongListenUseCase = TrackSongListenUseCase(songRepository);
+
+  // __AI Ollama __//
+  final ollamaAiRemoteDataSource = OllamaAiRemoteDataSource();
+  final aiSearchRepository = AiSearchRepositoryImpl(ollamaAiRemoteDataSource);
+  final analyzeSearchQueryUseCase = AnalyzeSearchQueryUseCase(
+    aiSearchRepository,
+  );
 
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider<GetWeeklyTrendingSongsUseCase>.value(
           value: getWeeklyTrendingSongsUseCase,
+        ),
+        RepositoryProvider<AnalyzeSearchQueryUseCase>.value(
+          value: analyzeSearchQueryUseCase,
         ),
       ],
       child: MultiBlocProvider(
@@ -72,17 +88,16 @@ void main() async {
               trackSongListenUseCase: trackSongListenUseCase,
             ),
           ),
-          BlocProvider<FavoriteCubit>(
-            create: (_) => FavoriteCubit(),
-          ),
-          BlocProvider<RecentCubit>(
-            create: (_) => RecentCubit(),
+          BlocProvider<FavoriteCubit>(create: (_) => FavoriteCubit()),
+          BlocProvider<RecentCubit>(create: (_) => RecentCubit()),
+          BlocProvider<SearchCubit>(
+            create: (_) => SearchCubit(
+              analyzeSearchQueryUseCase: analyzeSearchQueryUseCase,
+            ),
           ),
         ],
         child: const MaterialApp(
-          home: SafeArea(
-            child: Scaffold(body: LoginScreen()),
-          ),
+          home: SafeArea(child: Scaffold(body: LoginScreen())),
           debugShowCheckedModeBanner: false,
         ),
       ),
