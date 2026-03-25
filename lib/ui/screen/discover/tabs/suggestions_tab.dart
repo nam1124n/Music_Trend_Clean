@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
+import 'package:login_flutter/domain/entities/trending_song_entity.dart';
+import 'package:login_flutter/domain/usecases/get_weekly_trending_songs_usecase.dart';
 import 'package:login_flutter/ui/screen/admin/bloc/song_bloc.dart';
 import 'package:login_flutter/ui/screen/admin/bloc/song_state.dart';
 import 'package:login_flutter/ui/screen/audio/cubit/audio_player_cubit.dart';
 import 'package:login_flutter/ui/screen/audio/cubit/audio_player_state.dart';
 import 'package:login_flutter/ui/screen/discover/bloc/favorite_cubit.dart';
 import 'package:login_flutter/ui/screen/discover/bloc/recent_cubit.dart';
+
 class SuggestionsTab extends StatelessWidget {
   const SuggestionsTab({super.key});
 
@@ -39,7 +42,7 @@ class SuggestionsTab extends StatelessWidget {
             return _buildEmptyState();
           }
 
-          return _buildContent(state.songs);
+          return _buildContent(context, state.songs);
         }
 
         return const Center(
@@ -49,9 +52,7 @@ class SuggestionsTab extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(List<SongEntity> songs) {
-    final trendingSongs = songs.take(4).toList();
-
+  Widget _buildContent(BuildContext context, List<SongEntity> songs) {
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 24),
       child: Column(
@@ -68,21 +69,7 @@ class SuggestionsTab extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(
-            height: 160,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: trendingSongs.length,
-              separatorBuilder: (_, _) => const SizedBox(width: 12),
-              itemBuilder: (context, index) {
-                final song = trendingSongs[index];
-                final colors = _trendingPalettes[index % _trendingPalettes.length];
-
-                return _buildTrendingCard(song: song, colors: colors);
-              },
-            ),
-          ),
+          _buildTrendingSection(context),
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
             child: Row(
@@ -113,10 +100,95 @@ class SuggestionsTab extends StatelessWidget {
     );
   }
 
+  Widget _buildTrendingSection(BuildContext context) {
+    final getWeeklyTrendingSongsUseCase =
+        context.read<GetWeeklyTrendingSongsUseCase>();
+
+    return StreamBuilder<List<TrendingSongEntity>>(
+      stream: getWeeklyTrendingSongsUseCase(limit: 4),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting &&
+            !snapshot.hasData) {
+          return const SizedBox(
+            height: 160,
+            child: Center(
+              child: CircularProgressIndicator(color: Color(0xFF8C52FF)),
+            ),
+          );
+        }
+
+        final trendingSongs = snapshot.data ?? const <TrendingSongEntity>[];
+
+        if (trendingSongs.isEmpty) {
+          return Container(
+            height: 160,
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.local_fire_department_outlined,
+                  size: 32,
+                  color: Color(0xFF8C52FF),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Chưa có đủ lượt nghe để xếp hạng tuần này',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Top 4 sẽ tự cập nhật khi người dùng nghe đủ thời lượng.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return SizedBox(
+          height: 160,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: trendingSongs.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              final trendingSong = trendingSongs[index];
+              final colors =
+                  _trendingPalettes[index % _trendingPalettes.length];
+
+              return _buildTrendingCard(
+                trendingSong: trendingSong,
+                colors: colors,
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildTrendingCard({
-    required SongEntity song,
+    required TrendingSongEntity trendingSong,
     required List<Color> colors,
   }) {
+    final song = trendingSong.song;
+
     return Container(
       width: 250,
       decoration: BoxDecoration(
@@ -152,9 +224,10 @@ class SuggestionsTab extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                _buildTrendingStats(trendingSong),
+                const Spacer(),
                 Text(
                   song.title,
                   maxLines: 2,
@@ -181,6 +254,64 @@ class SuggestionsTab extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Widget _buildTrendingStats(TrendingSongEntity trendingSong) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        _buildStatChip(
+          icon: Icons.people_alt_outlined,
+          label: '${_formatCount(trendingSong.uniqueUserCount)} người nghe',
+        ),
+        _buildStatChip(
+          icon: Icons.headphones_outlined,
+          label: '${_formatCount(trendingSong.totalPlayCount)} lượt nghe',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatChip({
+    required IconData icon,
+    required String label,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.28),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: Colors.white),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatCount(int value) {
+    if (value >= 1000000) {
+      return '${(value / 1000000).toStringAsFixed(value % 1000000 == 0 ? 0 : 1)}M';
+    }
+
+    if (value >= 1000) {
+      return '${(value / 1000).toStringAsFixed(value % 1000 == 0 ? 0 : 1)}k';
+    }
+
+    return value.toString();
   }
 
   Widget _buildForYouList(List<SongEntity> songs) {

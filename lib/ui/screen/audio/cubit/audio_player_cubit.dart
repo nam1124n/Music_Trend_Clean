@@ -1,13 +1,23 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
+import 'package:login_flutter/domain/usecases/track_song_listen_usecase.dart';
 import 'package:login_flutter/ui/screen/audio/cubit/audio_player_state.dart';
 
 class AudioPlayerCubit extends Cubit<AudioPlayerState> {
-  final AudioPlayer _audioPlayer;
+  static const Duration _defaultListenThreshold = Duration(seconds: 30);
 
-  AudioPlayerCubit()
+  final AudioPlayer _audioPlayer;
+  final TrackSongListenUseCase _trackSongListenUseCase;
+  bool _hasTrackedCurrentPlayback = false;
+
+  AudioPlayerCubit({
+    required TrackSongListenUseCase trackSongListenUseCase,
+  })
       : _audioPlayer = AudioPlayer(),
+        _trackSongListenUseCase = trackSongListenUseCase,
         super(const AudioPlayerState()) {
     _initStreams();
   }
@@ -36,6 +46,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
 
     _audioPlayer.positionStream.listen((position) {
       emit(state.copyWith(position: position));
+      unawaited(_trackListenIfNeeded(position));
     });
 
     _audioPlayer.durationStream.listen((duration) {
@@ -47,6 +58,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
     try {
       final currentPlaylist = playlist ?? state.playlist;
       final index = currentPlaylist.indexWhere((s) => s.id == song.id);
+      _hasTrackedCurrentPlayback = false;
 
       emit(state.copyWith(
         currentSong: song,
@@ -100,6 +112,40 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
         await _audioPlayer.seek(Duration.zero);
       }
     }
+  }
+
+  Future<void> _trackListenIfNeeded(Duration position) async {
+    if (_hasTrackedCurrentPlayback) {
+      return;
+    }
+
+    final song = state.currentSong;
+    if (song == null) {
+      return;
+    }
+
+    final threshold = _listenThresholdFor(state.duration);
+    if (position < threshold) {
+      return;
+    }
+
+    _hasTrackedCurrentPlayback = true;
+
+    try {
+      await _trackSongListenUseCase(song);
+    } catch (_) {
+      _hasTrackedCurrentPlayback = false;
+    }
+  }
+
+  Duration _listenThresholdFor(Duration duration) {
+    if (duration == Duration.zero || duration >= _defaultListenThreshold) {
+      return _defaultListenThreshold;
+    }
+
+    return Duration(
+      milliseconds: (duration.inMilliseconds * 0.6).round(),
+    );
   }
 
   @override
