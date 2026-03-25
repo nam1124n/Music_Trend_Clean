@@ -8,65 +8,100 @@ class OllamaAiRemoteDataSource {
     required String query,
     required String model,
   }) async {
-    final schema = {
-      'type': 'object',
-      'properties': {
-        'keywords': {
-          'type': 'array',
-          'items': {'type': 'string'},
-        },
-        'artistHints': {
-          'type': 'array',
-          'items': {'type': 'string'},
-        },
-        'titleHints': {
-          'type': 'array',
-          'items': {'type': 'string'},
-        },
-        'reason': {'type': 'string'},
-      },
-      'required': ['keywords', 'artistHints', 'titleHints', 'reason'],
-    };
+    final normalizedBaseUrl = baseUrl.replaceFirst(RegExp(r'/+$'), '');
+    final client = http.Client();
 
-    final response = await http
-        .post(
-          Uri.parse('$baseUrl/chat'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({
-            'model': model,
-            'stream': false,
-            'format': schema,
-            'options': {'temperature': 0},
-            'messages': [
-              {
-                'role': 'system',
-                'content':
-                    'Ban la bo phan phan tich truy van tim nhac. Chi tra JSON hop le.',
-              },
-              {
-                'role': 'user',
-                'content':
-                    'Phan tich cau tim kiem nay: "$query". Tach ra keywords, artistHints, titleHints, reason.',
-              },
-            ],
-          }),
-        )
-        .timeout(Duration(seconds: AiConfig.timeoutSeconds));
+    try {
+      final request =
+          http.Request('POST', Uri.parse('$normalizedBaseUrl/generate'))
+            ..headers['Content-Type'] = 'application/json'
+            ..body = jsonEncode({
+              'model': model,
+              'stream': true,
+              'format': 'json',
+              'options': {'temperature': 0, 'num_predict': 160},
+              'prompt':
+                  'Ban la bo phan phan tich truy van tim nhac. '
+                  'Chi tra ve duy nhat mot JSON object hop le voi 4 truong: '
+                  'keywords, artistHints, titleHints, reason. '
+                  'Khong them bat ky van ban nao ngoai JSON. '
+                  'Phan tich cau tim kiem nay: "$query".',
+            });
 
-    if (response.statusCode >= 400) {
-      throw Exception('Ollama request failed: ${response.statusCode}');
+      final response = await client
+          .send(request)
+          .timeout(Duration(seconds: AiConfig.timeoutSeconds));
+
+      if (response.statusCode >= 400) {
+        final body = await response.stream.bytesToString();
+        throw Exception(
+          'Ollama request failed (${response.statusCode}): $body',
+        );
+      }
+
+      final rawContent = await _collectStreamedContent(response);
+      if (rawContent.isEmpty) {
+        throw Exception('AI tra ve rong');
+      }
+
+      final content = _extractJsonObject(rawContent);
+      final data = jsonDecode(content) as Map<String, dynamic>;
+
+      return {
+        'keywords': _readList(data['keywords']),
+        'artistHints': _readList(data['artistHints']),
+        'titleHints': _readList(data['titleHints']),
+        'reason': data['reason']?.toString().trim() ?? '',
+      };
+    } finally {
+      client.close();
+    }
+  }
+
+  Future<String> _collectStreamedContent(http.StreamedResponse response) async {
+    final buffer = StringBuffer();
+
+    await for (final line
+        in response.stream
+            .transform(utf8.decoder)
+            .transform(const LineSplitter())
+            .timeout(Duration(seconds: AiConfig.timeoutSeconds))) {
+      if (line.trim().isEmpty) {
+        continue;
+      }
+
+      final chunk = jsonDecode(line) as Map<String, dynamic>;
+      final apiError = chunk['error']?.toString();
+      if (apiError != null && apiError.isNotEmpty) {
+        throw Exception('Ollama error: $apiError');
+      }
+
+      buffer.write(chunk['response']?.toString() ?? '');
     }
 
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    final content = (data['message']?['content'] as String? ?? '')
+    return buffer.toString().trim();
+  }
+
+  String _extractJsonObject(String rawContent) {
+    final cleaned = rawContent
         .replaceAll('```json', '')
         .replaceAll('```', '')
         .trim();
 
-    if (content.isEmpty) {
-      throw Exception('AI tra ve rong');
+    final start = cleaned.indexOf('{');
+    final end = cleaned.lastIndexOf('}');
+    if (start == -1 || end == -1 || end < start) {
+      throw Exception('AI khong tra ve JSON hop le');
     }
 
-    return jsonDecode(content) as Map<String, dynamic>;
+    return cleaned.substring(start, end + 1);
+  }
+
+  List<String> _readList(Object? value) {
+    if (value is! List) {
+      return const [];
+    }
+
+    return value.map((item) => item.toString().trim()).toList();
   }
 }

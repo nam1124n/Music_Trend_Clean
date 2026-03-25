@@ -5,27 +5,48 @@ import 'package:login_flutter/domain/repositories/ai_search_repository.dart';
 
 class AiSearchRepositoryImpl implements AiSearchRepository {
   final OllamaAiRemoteDataSource remoteDataSource;
-  AiSearchRepositoryImpl(this.remoteDataSource);
+  final String localBaseUrl;
+  final String localModel;
+  final String cloudBaseUrl;
+  final String cloudModel;
+
+  AiSearchRepositoryImpl(
+    this.remoteDataSource, {
+    String? localBaseUrl,
+    String? localModel,
+    String? cloudBaseUrl,
+    String? cloudModel,
+  }) : localBaseUrl = localBaseUrl ?? AiConfig.localBaseUrl,
+       localModel = localModel ?? AiConfig.localModel,
+       cloudBaseUrl = cloudBaseUrl ?? AiConfig.cloudBaseUrl,
+       cloudModel = cloudModel ?? AiConfig.cloudModel;
 
   @override
   Future<SearchPlanEntity> analyzeQuery(String query) async {
+    Object? localError;
+    Object? cloudError;
+
     try {
       final data = await remoteDataSource.analyzeQuery(
-        baseUrl: AiConfig.localBaseUrl,
+        baseUrl: localBaseUrl,
         query: query,
-        model: AiConfig.localModel,
+        model: localModel,
       );
       return _map(query, data, 'local');
-    } catch (_) {
-      if (AiConfig.cloudBaseUrl.isNotEmpty) {
+    } catch (error) {
+      localError = error;
+
+      if (cloudBaseUrl.isNotEmpty) {
         try {
           final data = await remoteDataSource.analyzeQuery(
-            baseUrl: AiConfig.cloudBaseUrl,
+            baseUrl: cloudBaseUrl,
             query: query,
-            model: AiConfig.cloudModel,
+            model: cloudModel,
           );
           return _map(query, data, 'cloud');
-        } catch (_) {}
+        } catch (error) {
+          cloudError = error;
+        }
       }
 
       return SearchPlanEntity(
@@ -34,7 +55,10 @@ class AiSearchRepositoryImpl implements AiSearchRepository {
         artistHints: const [],
         titleHints: const [],
         provider: 'rule',
-        reason: 'Fallback search thuong',
+        reason: _buildFallbackReason(
+          localError: localError,
+          cloudError: cloudError,
+        ),
       );
     }
   }
@@ -56,5 +80,28 @@ class AiSearchRepositoryImpl implements AiSearchRepository {
       provider: provider,
       reason: data['reason']?.toString() ?? '',
     );
+  }
+
+  String _buildFallbackReason({Object? localError, Object? cloudError}) {
+    final parts = <String>['Fallback search thuong'];
+
+    if (localError != null) {
+      parts.add('Local AI loi: ${_cleanError(localError)}');
+    }
+
+    if (cloudError != null) {
+      parts.add('Cloud AI loi: ${_cleanError(cloudError)}');
+    }
+
+    return parts.join('. ');
+  }
+
+  String _cleanError(Object error) {
+    const prefix = 'Exception: ';
+    final message = error.toString();
+    if (message.startsWith(prefix)) {
+      return message.substring(prefix.length);
+    }
+    return message;
   }
 }
