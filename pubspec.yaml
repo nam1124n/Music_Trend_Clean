@@ -43,6 +43,9 @@ dependencies:
   http: ^1.2.0
   just_audio: ^0.9.36
   share_plus: ^12.0.1
+  flutter_riverpod: ^2.6.1
+  
+  
 
 
 dev_dependencies:

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:login_flutter/ui/screen/auth/bloc/auth_bloc.dart';
 import 'package:login_flutter/ui/screen/auth/bloc/auth_event.dart';
 import 'package:login_flutter/ui/screen/auth/bloc/auth_state.dart';
+import 'package:login_flutter/ui/screen/auth/forgot_password/forgot_password_screen.dart';
 import 'package:login_flutter/ui/screen/auth/signup_screen.dart';
 import 'package:login_flutter/ui/screen/home/home_screen.dart';
 
@@ -202,7 +203,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        const ForgotPasswordScreen(),
+                                  ),
+                                );
+                              },
                               style: TextButton.styleFrom(
                                 foregroundColor: const Color(0xFF9038FF),
                                 padding: EdgeInsets.zero,
@@ -215,6 +224,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
+
                           const SizedBox(height: 32),
                           ElevatedButton(
                             onPressed: state is AuthLoading

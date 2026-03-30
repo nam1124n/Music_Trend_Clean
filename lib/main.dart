@@ -29,6 +29,8 @@ import 'package:login_flutter/ui/screen/audio/cubit/audio_player_cubit.dart';
 import 'package:login_flutter/ui/screen/discover/bloc/favorite_cubit.dart';
 import 'package:login_flutter/ui/screen/discover/bloc/recent_cubit.dart';
 import 'package:login_flutter/ui/screen/search/cubit/search_cubit.dart';
+//provider
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -59,46 +61,48 @@ void main() async {
   );
 
   runApp(
-    MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<GetWeeklyTrendingSongsUseCase>.value(
-          value: getWeeklyTrendingSongsUseCase,
-        ),
-        RepositoryProvider<AnalyzeSearchQueryUseCase>.value(
-          value: analyzeSearchQueryUseCase,
-        ),
-      ],
-      child: MultiBlocProvider(
+    ProviderScope(
+      child: MultiRepositoryProvider(
         providers: [
-          BlocProvider<AuthBloc>(
-            create: (_) => AuthBloc(
-              loginUseCase: loginUseCase,
-              signUpUseCase: signUpUseCase,
-            ),
+          RepositoryProvider<GetWeeklyTrendingSongsUseCase>.value(
+            value: getWeeklyTrendingSongsUseCase,
           ),
-          BlocProvider<SongBloc>(
-            create: (_) => SongBloc(
-              getSongsUseCase: getSongsUseCase,
-              addSongUseCase: addSongUseCase,
-              deleteSongUseCase: deleteSongUseCase,
-            ),
-          ),
-          BlocProvider<AudioPlayerCubit>(
-            create: (_) => AudioPlayerCubit(
-              trackSongListenUseCase: trackSongListenUseCase,
-            ),
-          ),
-          BlocProvider<FavoriteCubit>(create: (_) => FavoriteCubit()),
-          BlocProvider<RecentCubit>(create: (_) => RecentCubit()),
-          BlocProvider<SearchCubit>(
-            create: (_) => SearchCubit(
-              analyzeSearchQueryUseCase: analyzeSearchQueryUseCase,
-            ),
+          RepositoryProvider<AnalyzeSearchQueryUseCase>.value(
+            value: analyzeSearchQueryUseCase,
           ),
         ],
-        child: const MaterialApp(
-          home: SafeArea(child: Scaffold(body: LoginScreen())),
-          debugShowCheckedModeBanner: false,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<AuthBloc>(
+              create: (_) => AuthBloc(
+                loginUseCase: loginUseCase,
+                signUpUseCase: signUpUseCase,
+              ),
+            ),
+            BlocProvider<SongBloc>(
+              create: (_) => SongBloc(
+                getSongsUseCase: getSongsUseCase,
+                addSongUseCase: addSongUseCase,
+                deleteSongUseCase: deleteSongUseCase,
+              ),
+            ),
+            BlocProvider<AudioPlayerCubit>(
+              create: (_) => AudioPlayerCubit(
+                trackSongListenUseCase: trackSongListenUseCase,
+              ),
+            ),
+            BlocProvider<FavoriteCubit>(create: (_) => FavoriteCubit()),
+            BlocProvider<RecentCubit>(create: (_) => RecentCubit()),
+            BlocProvider<SearchCubit>(
+              create: (_) => SearchCubit(
+                analyzeSearchQueryUseCase: analyzeSearchQueryUseCase,
+              ),
+            ),
+          ],
+          child: const MaterialApp(
+            home: SafeArea(child: Scaffold(body: LoginScreen())),
+            debugShowCheckedModeBanner: false,
+          ),
         ),
       ),
     ),

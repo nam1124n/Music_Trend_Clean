@@ -4,24 +4,22 @@ import 'package:firebase_auth/firebase_auth.dart';
 abstract class AuthRemoteDataSource {
   Future<UserModel> login(String email, String password);
   Future<UserModel> signUp(String fullName, String email, String password);
+
+  Future<Object?> resetPassword(String email) async {}
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  
-
   @override
   Future<UserModel> login(String email, String password) async {
     try {
       // ✅ Sửa: Gọi FirebaseAuth.instance.signIn.... trực tiếp ngay tại đây
-      final userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
       final user = userCredential.user!;
       return UserModel(
-        id: user.uid, 
+        id: user.uid,
         email: user.email ?? email,
-        fullName: user.displayName ?? "No Name", 
+        fullName: user.displayName ?? "No Name",
         token: "firebase-auth-token-giao-cho-tuong-lai",
       );
     } on FirebaseAuthException catch (e) {
@@ -35,13 +33,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> signUp(String fullName, String email, String password) async {
+  Future<UserModel> signUp(
+    String fullName,
+    String email,
+    String password,
+  ) async {
     try {
       // ✅ Sửa: Gọi FirebaseAuth.instance.create.... trực tiếp ngay tại đây luôn
-      final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       final user = userCredential.user!;
       await user.updateDisplayName(fullName);
       return UserModel(
@@ -60,4 +60,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+  @override
+  Future<void> resetPassword(String email) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user - not - found ') {
+        throw Exception(' khong tim thay tai khoan voi email nay. ');
+      }
+
+      throw Exception('Lỗi quên mật khẩu: ${e.message}');
+    }
+  }
 }
