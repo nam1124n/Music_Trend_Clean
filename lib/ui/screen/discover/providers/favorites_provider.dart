@@ -1,8 +1,13 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
 
-class FavoriteCubit extends Cubit<List<SongEntity>> {
-  FavoriteCubit() : super([]);
+final favoriteNotifierProvider =
+    StateNotifierProvider<FavoriteNotifier, List<SongEntity>>((ref) {
+      return FavoriteNotifier();
+    });
+
+class FavoriteNotifier extends StateNotifier<List<SongEntity>> {
+  FavoriteNotifier() : super([]);
 
   void toggleFavorite(SongEntity song) {
     final currentList = List<SongEntity>.from(state);
@@ -14,7 +19,7 @@ class FavoriteCubit extends Cubit<List<SongEntity>> {
       currentList.add(song);
     }
 
-    emit(currentList);
+    state = currentList;
   }
 
   bool isFavorite(String songId) {

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:login_flutter/domain/entities/profile_entity.dart';
-import 'package:login_flutter/ui/screen/profile/bloc/profile_bloc.dart';
 import 'package:login_flutter/ui/screen/profile/edit_profile_screen.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -44,14 +42,11 @@ class ProfileActions extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(18),
                 onTap: () {
-                  final bloc = context.read<ProfileBloc>();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => BlocProvider.value(
-                        value: bloc,
-                        child: EditProfileScreen(currentProfile: profile),
-                      ),
+                      builder: (_) =>
+                          EditProfileScreen(currentProfile: profile),
                     ),
                   );
                 },

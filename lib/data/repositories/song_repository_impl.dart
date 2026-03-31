@@ -24,23 +24,25 @@ class SongRepositoryImpl implements SongRepository {
   @override
   Stream<List<TrendingSongEntity>> getWeeklyTrendingSongs({int limit = 4}) {
     return remoteDataSource.getWeeklyTrendingSongsStream().map((snapshot) {
-      final rankedSongs = snapshot.docs.map((doc) {
-        final data = doc.data();
+      final rankedSongs =
+          snapshot.docs.map((doc) {
+            final data = doc.data();
 
-        return TrendingSongEntity(
-          song: SongModel.fromFirestore(data, doc.id),
-          uniqueUserCount: (data['uniqueUserCount'] as num?)?.toInt() ?? 0,
-          totalPlayCount: (data['totalPlayCount'] as num?)?.toInt() ?? 0,
-        );
-      }).toList()
-        ..sort((a, b) {
-          final uniqueCompare = b.uniqueUserCount.compareTo(a.uniqueUserCount);
-          if (uniqueCompare != 0) {
-            return uniqueCompare;
-          }
+            return TrendingSongEntity(
+              song: SongModel.fromFirestore(data, doc.id),
+              uniqueUserCount: (data['uniqueUserCount'] as num?)?.toInt() ?? 0,
+              totalPlayCount: (data['totalPlayCount'] as num?)?.toInt() ?? 0,
+            );
+          }).toList()..sort((a, b) {
+            final uniqueCompare = b.uniqueUserCount.compareTo(
+              a.uniqueUserCount,
+            );
+            if (uniqueCompare != 0) {
+              return uniqueCompare;
+            }
 
-          return b.totalPlayCount.compareTo(a.totalPlayCount);
-        });
+            return b.totalPlayCount.compareTo(a.totalPlayCount);
+          });
 
       return rankedSongs.take(limit).toList();
     });
@@ -75,9 +77,6 @@ class SongRepositoryImpl implements SongRepository {
   @override
   Future<void> trackSongListen(SongEntity song) async {
     final model = SongModel.fromEntity(song);
-    await remoteDataSource.trackSongListen({
-      ...model.toMap(),
-      'id': song.id,
-    });
+    await remoteDataSource.trackSongListen({...model.toMap(), 'id': song.id});
   }
 }

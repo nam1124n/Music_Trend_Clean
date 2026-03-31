@@ -46,13 +46,13 @@ class AudioPlayerState extends Equatable {
 
   @override
   List<Object?> get props => [
-        currentSong,
-        isPlaying,
-        isLoading,
-        isError,
-        position,
-        duration,
-        playlist,
-        currentIndex,
-      ];
+    currentSong,
+    isPlaying,
+    isLoading,
+    isError,
+    position,
+    duration,
+    playlist,
+    currentIndex,
+  ];
 }

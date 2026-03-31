@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/ui/screen/admin/admin_dashboard_screen.dart';
-import 'package:login_flutter/ui/screen/auth/bloc/auth_bloc.dart';
-import 'package:login_flutter/ui/screen/auth/bloc/auth_state.dart';
+import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
+import 'package:login_flutter/ui/screen/auth/providers/auth_state.dart';
 
-class DiscoverAppBar extends StatelessWidget {
+class DiscoverAppBar extends ConsumerWidget {
   const DiscoverAppBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    final isAdmin =
+        authState is AuthSuccess && authState.user.email == 'admin@gmail.com';
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Top Header
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
           child: Row(
             children: [
-              // Logo
               Container(
                 width: 40,
                 height: 40,
@@ -26,15 +28,12 @@ class DiscoverAppBar extends StatelessWidget {
                   color: Color(0xFFE8DEFF),
                 ),
                 child: const Center(
-                  child: Icon(
-                    Icons.graphic_eq,
-                    color: Color(0xFF8C52FF),
-                  ),
+                  child: Icon(Icons.graphic_eq, color: Color(0xFF8C52FF)),
                 ),
               ),
               const SizedBox(width: 16),
               const Text(
-                "Khám phá Âm nhạc",
+                'Khám phá Âm nhạc',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -42,43 +41,30 @@ class DiscoverAppBar extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              // ── Nút Admin (Chỉ hiển thị cho admin@gmail.com) ──
-              BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                  if (state is AuthSuccess && state.user.email == 'admin@gmail.com') {
-                    return GestureDetector(
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const AdminDashboardScreen()),
-                      ),
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: const Color(0xFF8C52FF),
-                          border: Border.all(color: Colors.transparent),
-                        ),
-                        child: const Icon(
-                          Icons.admin_panel_settings,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                    );
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-              BlocBuilder<AuthBloc, AuthState>(
-                builder: (context, state) {
-                   if (state is AuthSuccess && state.user.email == 'admin@gmail.com') {
-                     return const SizedBox(width: 8);
-                   }
-                   return const SizedBox.shrink();
-                },
-              ),
-              // Notification Bell
+              if (isAdmin)
+                GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AdminDashboardScreen(),
+                    ),
+                  ),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: const Color(0xFF8C52FF),
+                      border: Border.all(color: Colors.transparent),
+                    ),
+                    child: const Icon(
+                      Icons.admin_panel_settings,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              if (isAdmin) const SizedBox(width: 8),
               Container(
                 width: 40,
                 height: 40,
@@ -94,22 +80,18 @@ class DiscoverAppBar extends StatelessWidget {
             ],
           ),
         ),
-        // Search Bar
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Container(
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6), // Light grey
+              color: const Color(0xFFF3F4F6),
               borderRadius: BorderRadius.circular(22),
             ),
             child: TextField(
               decoration: InputDecoration(
-                hintText: "Tìm kiếm bài hát, nghệ sĩ hoặc album",
-                hintStyle: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 14,
-                ),
+                hintText: 'Tìm kiếm bài hát, nghệ sĩ hoặc album',
+                hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                 prefixIcon: Icon(
                   Icons.search,
                   color: Colors.grey.shade500,

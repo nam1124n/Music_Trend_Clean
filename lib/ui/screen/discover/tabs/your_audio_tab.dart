@@ -91,10 +91,7 @@ class YourAudioTab extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
                 ),
                 const SizedBox(height: 16),
                 SizedBox(
@@ -226,10 +223,7 @@ class YourAudioTab extends StatelessWidget {
           ),
           child: const Text(
             "Bắt đầu ngay",
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
-            ),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
           ),
         ),
       ],
@@ -256,14 +250,17 @@ class DashedRectPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     var path = Path()
-      ..addRRect(RRect.fromRectAndRadius(
+      ..addRRect(
+        RRect.fromRectAndRadius(
           Rect.fromLTWH(0, 0, size.width, size.height),
-          const Radius.circular(16)));
+          const Radius.circular(16),
+        ),
+      );
 
     var dashWidth = gap;
     var dashSpace = gap;
     double currentPos = 0.0;
-    
+
     for (PathMetric metric in path.computeMetrics()) {
       while (currentPos < metric.length) {
         canvas.drawPath(

@@ -1,40 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
-import 'package:login_flutter/ui/screen/audio/cubit/audio_player_cubit.dart';
-import 'package:login_flutter/ui/screen/audio/cubit/audio_player_state.dart';
-import 'package:login_flutter/ui/screen/discover/bloc/favorite_cubit.dart';
-import 'package:login_flutter/ui/screen/discover/bloc/recent_cubit.dart';
+import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
+import 'package:login_flutter/ui/screen/discover/providers/favorites_provider.dart';
+import 'package:login_flutter/ui/screen/discover/providers/recents_provider.dart';
 
-class FavoritesTab extends StatelessWidget {
+class FavoritesTab extends ConsumerWidget {
   const FavoritesTab({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<FavoriteCubit, List<SongEntity>>(
-      builder: (context, favoriteSongs) {
-        if (favoriteSongs.isEmpty) {
-          return Center(
-            child: Text(
-              'Chưa có bài hát yêu thích nào',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
-            ),
-          );
-        }
-        return ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          itemCount: favoriteSongs.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final song = favoriteSongs[index];
-            return _buildSongItem(context, song, favoriteSongs);
-          },
-        );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favoriteSongs = ref.watch(favoriteNotifierProvider);
+
+    if (favoriteSongs.isEmpty) {
+      return Center(
+        child: Text(
+          'Chưa có bài hát yêu thích nào',
+          style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
+        ),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      itemCount: favoriteSongs.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        final song = favoriteSongs[index];
+        return _buildSongItem(context, ref, song, favoriteSongs);
       },
     );
   }
 
-  Widget _buildSongItem(BuildContext context, SongEntity song, List<SongEntity> playlist) {
+  Widget _buildSongItem(
+    BuildContext context,
+    WidgetRef ref,
+    SongEntity song,
+    List<SongEntity> playlist,
+  ) {
     final Color cardColor = const Color(0xFF8C52FF);
 
     return Container(
@@ -91,7 +94,11 @@ class FavoritesTab extends StatelessWidget {
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Icons.music_note, size: 14, color: Color(0xFF8C52FF)),
+                    const Icon(
+                      Icons.music_note,
+                      size: 14,
+                      color: Color(0xFF8C52FF),
+                    ),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
@@ -110,35 +117,36 @@ class FavoritesTab extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          // Nút trái tim (Yêu thích)
           GestureDetector(
             onTap: () {
-              context.read<FavoriteCubit>().toggleFavorite(song);
+              ref.read(favoriteNotifierProvider.notifier).toggleFavorite(song);
             },
             child: const Padding(
               padding: EdgeInsets.all(8.0),
-              child: Icon(
-                Icons.favorite,
-                color: Color(0xFF8C52FF),
-                size: 24,
-              ),
+              child: Icon(Icons.favorite, color: Color(0xFF8C52FF), size: 24),
             ),
           ),
-          // Nút Play
-          BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
-            builder: (context, playerState) {
-              final isPlayingThisSong = playerState.currentSong?.id == song.id && playerState.isPlaying;
-              final isLoadingThisSong = playerState.currentSong?.id == song.id && playerState.isLoading;
+          Consumer(
+            builder: (context, ref, _) {
+              final playerState = ref.watch(audioPlayerNotifierProvider);
+              final isPlayingThisSong =
+                  playerState.currentSong?.id == song.id &&
+                  playerState.isPlaying;
+              final isLoadingThisSong =
+                  playerState.currentSong?.id == song.id &&
+                  playerState.isLoading;
 
               return GestureDetector(
                 onTap: () {
                   if (isPlayingThisSong) {
-                    context.read<AudioPlayerCubit>().pause();
+                    ref.read(audioPlayerNotifierProvider.notifier).pause();
                   } else if (playerState.currentSong?.id == song.id) {
-                    context.read<AudioPlayerCubit>().resume();
+                    ref.read(audioPlayerNotifierProvider.notifier).resume();
                   } else {
-                    context.read<AudioPlayerCubit>().playSong(song, playlist: playlist);
-                    context.read<RecentCubit>().addRecent(song);
+                    ref
+                        .read(audioPlayerNotifierProvider.notifier)
+                        .playSong(song, playlist: playlist);
+                    ref.read(recentNotifierProvider.notifier).addRecent(song);
                   }
                 },
                 child: Container(
@@ -153,8 +161,12 @@ class FavoritesTab extends StatelessWidget {
                           ),
                         )
                       : Icon(
-                          isPlayingThisSong ? Icons.pause_circle_outline : Icons.play_circle_outline,
-                          color: isPlayingThisSong ? const Color(0xFF8C52FF) : Colors.grey.shade400,
+                          isPlayingThisSong
+                              ? Icons.pause_circle_outline
+                              : Icons.play_circle_outline,
+                          color: isPlayingThisSong
+                              ? const Color(0xFF8C52FF)
+                              : Colors.grey.shade400,
                           size: 28,
                         ),
                 ),

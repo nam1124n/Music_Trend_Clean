@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/ui/screen/admin/providers/song_provider.dart';
+import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
+import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
 import 'package:login_flutter/ui/screen/auth/login_screen.dart';
+import 'package:login_flutter/ui/screen/discover/providers/favorites_provider.dart';
+import 'package:login_flutter/ui/screen/discover/providers/recents_provider.dart';
+import 'package:login_flutter/ui/screen/profile/providers/profile_provider.dart';
+import 'package:login_flutter/ui/screen/search/providers/search_provider.dart';
 
-class ProfileHeader extends StatelessWidget {
+class ProfileHeader extends ConsumerWidget {
   final Color textPrimary;
 
   const ProfileHeader({super.key, required this.textPrimary});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       children: [
         _HeaderIconButton(
@@ -28,7 +36,9 @@ class ProfileHeader extends StatelessWidget {
         ),
         PopupMenuButton<String>(
           color: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           offset: const Offset(0, 46),
           onSelected: (value) async {
             if (value == 'logout') {
@@ -47,7 +57,10 @@ class ProfileHeader extends StatelessWidget {
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(dialogContext).pop(false),
-                        child: const Text('Không', style: TextStyle(color: Colors.grey)),
+                        child: const Text(
+                          'Không',
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -66,6 +79,13 @@ class ProfileHeader extends StatelessWidget {
               );
 
               if (confirm == true && context.mounted) {
+                ref.invalidate(audioPlayerNotifierProvider);
+                ref.invalidate(favoriteNotifierProvider);
+                ref.invalidate(recentNotifierProvider);
+                ref.invalidate(searchNotifierProvider);
+                ref.invalidate(songNotifierProvider);
+                ref.invalidate(profileNotifierProvider);
+                ref.invalidate(authNotifierProvider);
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (_) => const LoginScreen()),
                   (route) => false,
@@ -94,7 +114,7 @@ class ProfileHeader extends StatelessWidget {
           child: _HeaderIconButton(
             icon: Icons.settings_rounded,
             textPrimary: textPrimary,
-            onPressed: null, // Let PopupMenuButton handle the tap
+            onPressed: null,
           ),
         ),
       ],

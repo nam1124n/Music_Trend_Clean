@@ -20,17 +20,17 @@ class SongModel extends SongEntity {
   }
 
   Map<String, dynamic> toMap() => {
-        'title': title,
-        'artist': artist,
-        'audioUrl': audioUrl,
-        'imageUrl': imageUrl,
-      };
+    'title': title,
+    'artist': artist,
+    'audioUrl': audioUrl,
+    'imageUrl': imageUrl,
+  };
 
   factory SongModel.fromEntity(SongEntity entity) => SongModel(
-        id: entity.id,
-        title: entity.title,
-        artist: entity.artist,
-        audioUrl: entity.audioUrl,
-        imageUrl: entity.imageUrl,
-      );
+    id: entity.id,
+    title: entity.title,
+    artist: entity.artist,
+    audioUrl: entity.audioUrl,
+    imageUrl: entity.imageUrl,
+  );
 }

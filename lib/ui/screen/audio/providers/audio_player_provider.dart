@@ -1,56 +1,69 @@
 import 'dart:async';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
 import 'package:login_flutter/domain/usecases/track_song_listen_usecase.dart';
-import 'package:login_flutter/ui/screen/audio/cubit/audio_player_state.dart';
+import 'package:login_flutter/ui/screen/admin/providers/song_provider.dart';
+import 'package:login_flutter/ui/screen/audio/providers/audio_player_state.dart';
 
-class AudioPlayerCubit extends Cubit<AudioPlayerState> {
+final audioPlayerNotifierProvider =
+    StateNotifierProvider<AudioPlayerNotifier, AudioPlayerState>((ref) {
+      return AudioPlayerNotifier(
+        trackSongListenUseCase: ref.read(trackSongListenUseCaseProvider),
+      );
+    });
+
+class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
   static const Duration _defaultListenThreshold = Duration(seconds: 30);
 
   final AudioPlayer _audioPlayer;
   final TrackSongListenUseCase _trackSongListenUseCase;
+  StreamSubscription<PlayerState>? _playerStateSubscription;
+  StreamSubscription<Duration>? _positionSubscription;
+  StreamSubscription<Duration?>? _durationSubscription;
   bool _hasTrackedCurrentPlayback = false;
 
-  AudioPlayerCubit({
-    required TrackSongListenUseCase trackSongListenUseCase,
-  })
-      : _audioPlayer = AudioPlayer(),
-        _trackSongListenUseCase = trackSongListenUseCase,
-        super(const AudioPlayerState()) {
+  AudioPlayerNotifier({required TrackSongListenUseCase trackSongListenUseCase})
+    : _audioPlayer = AudioPlayer(),
+      _trackSongListenUseCase = trackSongListenUseCase,
+      super(const AudioPlayerState()) {
     _initStreams();
   }
 
   void _initStreams() {
-    _audioPlayer.playerStateStream.listen((playerState) {
+    _playerStateSubscription = _audioPlayer.playerStateStream.listen((
+      playerState,
+    ) {
       final isPlaying = playerState.playing;
       final processingState = playerState.processingState;
 
       if (processingState == ProcessingState.completed) {
-        // Auto play next song if possible
-        if (state.playlist.isNotEmpty && state.currentIndex < state.playlist.length - 1) {
+        if (state.playlist.isNotEmpty &&
+            state.currentIndex < state.playlist.length - 1) {
           next();
         } else {
-          emit(state.copyWith(isPlaying: false, position: Duration.zero));
+          state = state.copyWith(isPlaying: false, position: Duration.zero);
           _audioPlayer.seek(Duration.zero);
           _audioPlayer.pause();
         }
       } else {
-        emit(state.copyWith(
+        state = state.copyWith(
           isPlaying: isPlaying,
-          isLoading: processingState == ProcessingState.loading || processingState == ProcessingState.buffering,
-        ));
+          isLoading:
+              processingState == ProcessingState.loading ||
+              processingState == ProcessingState.buffering,
+        );
       }
     });
 
-    _audioPlayer.positionStream.listen((position) {
-      emit(state.copyWith(position: position));
+    _positionSubscription = _audioPlayer.positionStream.listen((position) {
+      state = state.copyWith(position: position);
       unawaited(_trackListenIfNeeded(position));
     });
 
-    _audioPlayer.durationStream.listen((duration) {
-      emit(state.copyWith(duration: duration ?? Duration.zero));
+    _durationSubscription = _audioPlayer.durationStream.listen((duration) {
+      state = state.copyWith(duration: duration ?? Duration.zero);
     });
   }
 
@@ -60,18 +73,20 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       final index = currentPlaylist.indexWhere((s) => s.id == song.id);
       _hasTrackedCurrentPlayback = false;
 
-      emit(state.copyWith(
+      state = state.copyWith(
         currentSong: song,
         playlist: currentPlaylist,
         currentIndex: index != -1 ? index : 0,
         isLoading: true,
         isError: false,
-      ));
+        position: Duration.zero,
+        duration: Duration.zero,
+      );
 
       await _audioPlayer.setUrl(song.audioUrl);
       _audioPlayer.play();
     } catch (e) {
-      emit(state.copyWith(isError: true, isLoading: false));
+      state = state.copyWith(isError: true, isLoading: false);
     }
   }
 
@@ -89,7 +104,7 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
 
   Future<void> next() async {
     if (state.playlist.isEmpty) return;
-    
+
     final nextIndex = state.currentIndex + 1;
     if (nextIndex < state.playlist.length) {
       final nextSong = state.playlist[nextIndex];
@@ -143,14 +158,15 @@ class AudioPlayerCubit extends Cubit<AudioPlayerState> {
       return _defaultListenThreshold;
     }
 
-    return Duration(
-      milliseconds: (duration.inMilliseconds * 0.6).round(),
-    );
+    return Duration(milliseconds: (duration.inMilliseconds * 0.6).round());
   }
 
   @override
-  Future<void> close() {
+  void dispose() {
+    _playerStateSubscription?.cancel();
+    _positionSubscription?.cancel();
+    _durationSubscription?.cancel();
     _audioPlayer.dispose();
-    return super.close();
+    super.dispose();
   }
 }

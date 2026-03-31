@@ -127,27 +127,19 @@ class SongRemoteDataSource {
           (statsSnapshot.data()?['uniqueUserCount'] as num?)?.toInt() ?? 0;
       final isNewUniqueListener = !listenerSnapshot.exists;
 
-      transaction.set(
-        statsRef,
-        {
-          ...songData,
-          'songId': songId,
-          'weekKey': weekKey,
-          'totalPlayCount': currentTotal + 1,
-          'uniqueUserCount': currentUnique + (isNewUniqueListener ? 1 : 0),
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      transaction.set(statsRef, {
+        ...songData,
+        'songId': songId,
+        'weekKey': weekKey,
+        'totalPlayCount': currentTotal + 1,
+        'uniqueUserCount': currentUnique + (isNewUniqueListener ? 1 : 0),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
 
-      transaction.set(
-        listenerRef,
-        {
-          'userId': userId,
-          'listenedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
+      transaction.set(listenerRef, {
+        'userId': userId,
+        'listenedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
     });
   }
 

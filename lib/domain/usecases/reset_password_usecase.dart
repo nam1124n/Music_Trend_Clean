@@ -1,4 +1,3 @@
-import 'package:login_flutter/domain/entities/user_entity.dart';
 import 'package:login_flutter/domain/repositories/auth_repository.dart';
 
 class ResetPasswordUseCase {

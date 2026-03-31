@@ -17,7 +17,7 @@ Dự án này gồm 2 luồng chính:
 
 - Flutter
 - Dart
-- flutter_bloc
+- flutter_riverpod
 - Firebase Core
 - Firebase Auth
 - Cloud Firestore
@@ -105,7 +105,7 @@ README này mô tả đúng trạng thái hiện tại của code. Một số ph
 - Nút `Forgot password?` chưa xử lý.
 - Ô search ở `DiscoverAppBar` hiện chỉ là UI, chưa nối với logic tìm kiếm.
 - Tab `Your Audio` mới là giao diện tĩnh.
-- `Favorites` và `Recents` hiện lưu trong memory qua Cubit, chưa persist xuống Firestore hay local storage.
+- `Favorites` và `Recents` hiện lưu trong memory qua Riverpod, chưa persist xuống Firestore hay local storage.
 - Test widget hiện tại mới là placeholder; test đáng chú ý nhất đang nằm ở phần AI search repository.
 
 ## Kiến trúc dự án
@@ -133,10 +133,10 @@ Chứa tầng làm việc với dữ liệu:
 
 Chứa tầng giao diện:
 
-- `screen/auth`: đăng nhập, đăng ký, `AuthBloc`
+- `screen/auth`: đăng nhập, đăng ký, auth state bằng Riverpod
 - `screen/discover`: màn hình khám phá, tab suggestion/favorite/recent/your audio
 - `screen/search`: tìm kiếm AI
-- `screen/audio`: `AudioPlayerCubit`
+- `screen/audio`: audio state bằng Riverpod
 - `screen/admin`: dashboard quản trị bài hát
 - `screen/profile`: xem và sửa profile
 - `screen/home`: điều phối bottom navigation
@@ -411,7 +411,7 @@ File này đang kiểm tra:
 - Nên chuyển cấu hình Cloudinary ra `--dart-define` hoặc file secret riêng, tránh hard-code trong source.
 - Nên persist favorites/recents xuống Firestore hoặc local database.
 - Nên hoàn thiện `Your Audio`, `Forgot password`, nút `+` ở bottom nav và ô search tại `Discover`.
-- Nên bổ sung test cho `SongBloc`, `AudioPlayerCubit`, `SearchCubit` và các use case quan trọng.
+- Nên bổ sung test cho các notifier/provider của `song`, `audio player`, `search` và các use case quan trọng.
 
 ## Lệnh hữu ích
 

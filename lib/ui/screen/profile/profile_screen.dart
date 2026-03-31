@@ -1,16 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:login_flutter/data/datasource/remote/profile_remote_data_source.dart';
-import 'package:login_flutter/data/repositories/profile_repository_impl.dart';
-import 'package:login_flutter/domain/usecases/get_profile_usecase.dart';
-import 'package:login_flutter/domain/usecases/update_avatar_usecase.dart';
-import 'package:login_flutter/domain/usecases/update_profile_usecase.dart';
-import 'package:login_flutter/ui/screen/profile/bloc/profile_bloc.dart';
-import 'package:login_flutter/ui/screen/profile/bloc/profile_event.dart';
-import 'package:login_flutter/ui/screen/profile/bloc/profile_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/ui/screen/profile/providers/profile_provider.dart';
+import 'package:login_flutter/ui/screen/profile/providers/profile_state.dart';
 import 'package:login_flutter/ui/screen/profile/widgets/profile_actions.dart';
 import 'package:login_flutter/ui/screen/profile/widgets/profile_header.dart';
 import 'package:login_flutter/ui/screen/profile/widgets/profile_info.dart';
@@ -27,30 +20,17 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        final repository = ProfileRepositoryImpl(
-          remoteDataSource: ProfileRemoteDataSourceImpl(),
-        );
-        return ProfileBloc(
-          getProfileUseCase: GetProfileUseCase(repository),
-          updateAvatarUseCase: UpdateAvatarUseCase(repository),
-          updateProfileUseCase: UpdateProfileUseCase(repository),
-        )..add(FetchProfileEvent());
-      },
-      child: const Scaffold(
-        backgroundColor: _background,
-        body: ProfileContent(),
-      ),
-    );
+    return const Scaffold(backgroundColor: _background, body: ProfileContent());
   }
 }
 
-class ProfileContent extends StatelessWidget {
+class ProfileContent extends ConsumerWidget {
   const ProfileContent({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(profileNotifierProvider);
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -63,60 +43,66 @@ class ProfileContent extends StatelessWidget {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 430),
-            child: BlocBuilder<ProfileBloc, ProfileState>(
-              builder: (context, state) {
-                if (state is ProfileLoading || state is ProfileInitial) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is ProfileError) {
-                  return Center(child: Text('Error: ${state.message}'));
-                } else if (state is ProfileLoaded) {
-                  final profile = state.profile;
-                  return SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const ProfileHeader(textPrimary: ProfileScreen._textPrimary),
-                        const SizedBox(height: 18),
-                        ProfileInfo(
-                          profile: profile,
-                          primaryColor: ProfileScreen._primary,
-                          textPrimary: ProfileScreen._textPrimary,
-                          textMuted: ProfileScreen._textMuted,
-                        ),
-                        const SizedBox(height: 24),
-                        ProfileStats(
-                          profile: profile,
-                          textPrimary: ProfileScreen._textPrimary,
-                          textMuted: ProfileScreen._textMuted,
-                        ),
-                        const SizedBox(height: 22),
-                        ProfileActions(
-                          profile: profile,
-                          primaryColor: ProfileScreen._primary,
-                          textPrimary: ProfileScreen._textPrimary,
-                        ),
-                        const SizedBox(height: 24),
-                        const _LibraryTabs(),
-                        const SizedBox(height: 18),
-                        const _FeaturedPlaylistCard(),
-                        const SizedBox(height: 16),
-                        const _SecondaryPlaylists(),
-                        const SizedBox(height: 18),
-                        _CreatePlaylistButton(onPressed: () {}),
-                      ],
-                    ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
+            child: _buildBody(state),
           ),
         ),
       ),
     );
   }
+
+  Widget _buildBody(ProfileState state) {
+    if (state is ProfileLoading || state is ProfileInitial) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state is ProfileError) {
+      return Center(child: Text('Error: ${state.message}'));
+    }
+
+    if (state is ProfileLoaded) {
+      final profile = state.profile;
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const ProfileHeader(textPrimary: ProfileScreen._textPrimary),
+            const SizedBox(height: 18),
+            ProfileInfo(
+              profile: profile,
+              primaryColor: ProfileScreen._primary,
+              textPrimary: ProfileScreen._textPrimary,
+              textMuted: ProfileScreen._textMuted,
+            ),
+            const SizedBox(height: 24),
+            ProfileStats(
+              profile: profile,
+              textPrimary: ProfileScreen._textPrimary,
+              textMuted: ProfileScreen._textMuted,
+            ),
+            const SizedBox(height: 22),
+            ProfileActions(
+              profile: profile,
+              primaryColor: ProfileScreen._primary,
+              textPrimary: ProfileScreen._textPrimary,
+            ),
+            const SizedBox(height: 24),
+            const _LibraryTabs(),
+            const SizedBox(height: 18),
+            const _FeaturedPlaylistCard(),
+            const SizedBox(height: 16),
+            const _SecondaryPlaylists(),
+            const SizedBox(height: 18),
+            _CreatePlaylistButton(onPressed: () {}),
+          ],
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
+  }
 }
+
 class _LibraryTabs extends StatelessWidget {
   const _LibraryTabs();
 

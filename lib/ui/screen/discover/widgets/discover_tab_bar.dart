@@ -17,10 +17,7 @@ class DiscoverTabBar extends StatelessWidget {
         indicatorColor: const Color(0xFF8C52FF),
         indicatorSize: TabBarIndicatorSize.label,
         dividerColor: Colors.grey.shade200,
-        labelStyle: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-        ),
+        labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         unselectedLabelStyle: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.normal,

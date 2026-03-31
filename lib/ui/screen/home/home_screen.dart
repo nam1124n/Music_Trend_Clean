@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:login_flutter/ui/screen/admin/bloc/song_bloc.dart';
-import 'package:login_flutter/ui/screen/admin/bloc/song_event.dart';
-import 'package:login_flutter/ui/screen/audio/cubit/audio_player_cubit.dart';
-import 'package:login_flutter/ui/screen/audio/cubit/audio_player_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
+import 'package:login_flutter/ui/screen/create_audio/create_audio_screen.dart';
 import 'package:login_flutter/ui/screen/discover/discover_screen.dart';
 import 'package:login_flutter/ui/screen/discover/widgets/custom_bottom_nav.dart';
 import 'package:login_flutter/ui/screen/discover/widgets/mini_player.dart';
@@ -31,12 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    context.read<SongBloc>().add(LoadSongsEvent());
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -61,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HomeBottomBar extends StatelessWidget {
+class _HomeBottomBar extends ConsumerWidget {
   const _HomeBottomBar({
     required this.currentIndex,
     required this.onTabChanged,
@@ -71,52 +63,64 @@ class _HomeBottomBar extends StatelessWidget {
   final ValueChanged<int> onTabChanged;
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<AudioPlayerCubit, AudioPlayerState>(
-      builder: (context, state) {
-        final bool hasCurrentSong = state.currentSong != null;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasCurrentSong = ref.watch(
+      audioPlayerNotifierProvider.select((state) => state.currentSong != null),
+    );
 
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (hasCurrentSong)
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: MiniPlayer(),
-              ),
-            if (hasCurrentSong) const SizedBox(height: 8),
-            Container(
-              color: Colors.white,
-              child: SafeArea(
-                top: false,
-                child: SizedBox(
-                  height: 84,
-                  child: Stack(
-                    alignment: Alignment.topCenter,
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned.fill(
-                        top: 19,
-                        child: CustomBottomNav(
-                          currentIndex: currentIndex,
-                          onTap: onTabChanged,
-                        ),
-                      ),
-                      const Positioned(top: 0, child: _CreateButton()),
-                    ],
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (hasCurrentSong)
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: MiniPlayer(),
+          ),
+        if (hasCurrentSong) const SizedBox(height: 8),
+        Container(
+          color: Colors.white,
+          child: SafeArea(
+            top: false,
+            child: SizedBox(
+              height: 84,
+              child: Stack(
+                alignment: Alignment.topCenter,
+                clipBehavior: Clip.none,
+                children: [
+                  Positioned.fill(
+                    top: 19,
+                    child: CustomBottomNav(
+                      currentIndex: currentIndex,
+                      onTap: onTabChanged,
+                    ),
                   ),
-                ),
+                  Positioned(
+                    top: 0,
+                    child: _CreateButton(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const CreateAudioScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        );
-      },
+          ),
+        ),
+      ],
     );
   }
 }
 
 class _CreateButton extends StatelessWidget {
-  const _CreateButton();
+  const _CreateButton({required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +137,16 @@ class _CreateButton extends StatelessWidget {
           shape: BoxShape.circle,
           color: Color(0xFF8C52FF),
         ),
-        child: const Icon(Icons.add, color: Colors.white, size: 32),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: onTap,
+            child: const Center(
+              child: Icon(Icons.add, color: Colors.white, size: 32),
+            ),
+          ),
+        ),
       ),
     );
   }

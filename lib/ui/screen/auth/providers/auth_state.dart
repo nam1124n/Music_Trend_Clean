@@ -1,10 +1,9 @@
-// File: lib/features/auth/presentation/bloc/auth_state.dart
 import 'package:equatable/equatable.dart';
 import 'package:login_flutter/domain/entities/user_entity.dart';
 
 abstract class AuthState extends Equatable {
   const AuthState();
-  
+
   @override
   List<Object> get props => [];
 }

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:login_flutter/domain/entities/profile_entity.dart';
-import 'package:login_flutter/ui/screen/profile/bloc/profile_bloc.dart';
-import 'package:login_flutter/ui/screen/profile/bloc/profile_event.dart';
+import 'package:login_flutter/ui/screen/profile/providers/profile_provider.dart';
 
-class ProfileInfo extends StatelessWidget {
+class ProfileInfo extends ConsumerWidget {
   final ProfileEntity profile;
   final Color primaryColor;
   final Color textPrimary;
@@ -19,20 +18,22 @@ class ProfileInfo extends StatelessWidget {
     required this.textMuted,
   });
 
-  Future<void> _pickImage(BuildContext context) async {
+  Future<void> _pickImage(BuildContext context, WidgetRef ref) async {
     final picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null && context.mounted) {
-      context.read<ProfileBloc>().add(UpdateAvatarEvent(imagePath: image.path));
+      ref
+          .read(profileNotifierProvider.notifier)
+          .updateAvatar(imagePath: image.path);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         GestureDetector(
-          onTap: () => _pickImage(context),
+          onTap: () => _pickImage(context, ref),
           child: Stack(
             clipBehavior: Clip.none,
             children: [

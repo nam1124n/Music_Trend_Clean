@@ -5,7 +5,7 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> login(String email, String password);
   Future<UserModel> signUp(String fullName, String email, String password);
 
-  Future<Object?> resetPassword(String email) async {}
+  Future<void> resetPassword(String email);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {

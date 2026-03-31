@@ -9,7 +9,7 @@ class ProfileLocalDataSourceImpl implements ProfileLocalDataSource {
   Future<ProfileModel> getProfile() async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 800));
-    
+
     // Returning mock data as per requirements:
     // Username: @musiclover_2024
     // ID: 982347102

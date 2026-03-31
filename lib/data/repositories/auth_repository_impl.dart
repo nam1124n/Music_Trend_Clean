@@ -1,4 +1,3 @@
-import 'package:login_flutter/data/dto/auth/user_model.dart';
 import 'package:login_flutter/domain/entities/user_entity.dart';
 import 'package:login_flutter/domain/repositories/auth_repository.dart';
 import 'package:login_flutter/data/datasource/remote/auth_remote_data_source.dart';

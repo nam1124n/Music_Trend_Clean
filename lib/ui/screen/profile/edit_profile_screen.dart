@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/profile_entity.dart';
-import 'package:login_flutter/ui/screen/profile/bloc/profile_bloc.dart';
-import 'package:login_flutter/ui/screen/profile/bloc/profile_event.dart';
+import 'package:login_flutter/ui/screen/profile/providers/profile_provider.dart';
 
-class EditProfileScreen extends StatefulWidget {
+class EditProfileScreen extends ConsumerStatefulWidget {
   final ProfileEntity currentProfile;
 
   const EditProfileScreen({super.key, required this.currentProfile});
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   late TextEditingController _usernameController;
 
   @override
   void initState() {
     super.initState();
-    _usernameController = TextEditingController(text: widget.currentProfile.username);
+    _usernameController = TextEditingController(
+      text: widget.currentProfile.username,
+    );
   }
 
   @override
@@ -30,10 +31,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _saveProfile() {
     final newUsername = _usernameController.text.trim();
-    if (newUsername.isNotEmpty && newUsername != widget.currentProfile.username) {
-      context.read<ProfileBloc>().add(UpdateProfileInfoEvent(username: newUsername));
+    if (newUsername.isNotEmpty &&
+        newUsername != widget.currentProfile.username) {
+      ref
+          .read(profileNotifierProvider.notifier)
+          .updateProfileInfo(username: newUsername);
     }
-    Navigator.pop(context); // Trở về ngay lập tức, màn hình Profile sẽ tự load state mới
+    Navigator.pop(context);
   }
 
   @override
@@ -72,14 +76,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   hintText: 'Enter your username',
                   filled: true,
                   fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(color: Color(0xFFA066FF), width: 1.5),
+                    borderSide: const BorderSide(
+                      color: Color(0xFFA066FF),
+                      width: 1.5,
+                    ),
                   ),
                 ),
               ),

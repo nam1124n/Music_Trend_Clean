@@ -1,8 +1,13 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
 
-class RecentCubit extends Cubit<List<SongEntity>> {
-  RecentCubit() : super([]);
+final recentNotifierProvider =
+    StateNotifierProvider<RecentNotifier, List<SongEntity>>((ref) {
+      return RecentNotifier();
+    });
+
+class RecentNotifier extends StateNotifier<List<SongEntity>> {
+  RecentNotifier() : super([]);
 
   void addRecent(SongEntity song) {
     final currentList = List<SongEntity>.from(state);
@@ -13,6 +18,6 @@ class RecentCubit extends Cubit<List<SongEntity>> {
     // Insert at index 0 (top of the list)
     currentList.insert(0, song);
 
-    emit(currentList);
+    state = currentList;
   }
 }

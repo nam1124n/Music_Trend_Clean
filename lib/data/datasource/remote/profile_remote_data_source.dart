@@ -43,9 +43,12 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     if (user != null) {
       final doc = await _db.collection('users').doc(user.uid).get();
       final data = doc.data() ?? {};
-      
+
       return ProfileModel(
-        username: data['username'] ?? user.displayName ?? '@user_${user.uid.substring(0, 5)}',
+        username:
+            data['username'] ??
+            user.displayName ??
+            '@user_${user.uid.substring(0, 5)}',
         id: user.uid,
         avatarUrl: data['avatarUrl'] ?? '',
         followers: data['followers'] ?? 1200,
@@ -53,7 +56,9 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
         likes: data['likes'] ?? 15000,
       );
     } else {
-      throw Exception('Không tìm thấy tài khoản để lấy profile. Yêu cầu đăng nhập.');
+      throw Exception(
+        'Không tìm thấy tài khoản để lấy profile. Yêu cầu đăng nhập.',
+      );
     }
   }
 }
