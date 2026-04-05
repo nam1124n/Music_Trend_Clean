@@ -5,6 +5,7 @@ import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.da
 import 'package:login_flutter/ui/screen/create_audio/create_audio_screen.dart';
 import 'package:login_flutter/ui/screen/discover/discover_screen.dart';
 import 'package:login_flutter/ui/screen/discover/widgets/custom_bottom_nav.dart';
+import 'package:login_flutter/ui/screen/my_audios/my_audios_screen.dart';
 import 'package:login_flutter/ui/screen/discover/widgets/mini_player.dart';
 import 'package:login_flutter/ui/screen/profile/profile_screen.dart';
 import 'package:login_flutter/ui/screen/search/search_screen.dart';
@@ -40,11 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           const DiscoverContent(),
           const SearchScreen(),
-          _PlaceholderTab(
-            icon: Icons.favorite_rounded,
-            title: l10n.likedTabTitle,
-            description: l10n.likedTabDescription,
-          ),
+          const MyAudiosScreen(),
           const ProfileScreen(),
         ],
       ),

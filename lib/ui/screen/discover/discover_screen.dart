@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:login_flutter/ui/screen/discover/widgets/discover_app_bar.dart';
 import 'package:login_flutter/ui/screen/discover/widgets/discover_tab_bar.dart';
 import 'package:login_flutter/ui/screen/discover/tabs/suggestions_tab.dart';
-import 'package:login_flutter/ui/screen/discover/tabs/your_audio_tab.dart';
 import 'package:login_flutter/ui/screen/discover/tabs/favorites_tab.dart';
 import 'package:login_flutter/ui/screen/discover/tabs/recents_tab.dart';
 
@@ -33,7 +32,7 @@ class _DiscoverContentState extends State<DiscoverContent>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -57,7 +56,6 @@ class _DiscoverContentState extends State<DiscoverContent>
                 const SuggestionsTab(),
                 const FavoritesTab(),
                 const RecentsTab(),
-                const YourAudioTab(),
               ],
             ),
           ),

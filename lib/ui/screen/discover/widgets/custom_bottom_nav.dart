@@ -43,9 +43,9 @@ class CustomBottomNav extends StatelessWidget {
             const SizedBox(width: 60),
             _buildNavItem(
               index: 2,
-              icon: Icons.favorite_border,
-              activeIcon: Icons.favorite,
-              label: l10n.likedTabTitle,
+              icon: Icons.library_music_outlined,
+              activeIcon: Icons.library_music,
+              label: l10n.yourAudioLabel,
             ),
             _buildNavItem(
               index: 3,

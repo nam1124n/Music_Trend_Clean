@@ -30,7 +30,6 @@ class DiscoverTabBar extends StatelessWidget {
           Tab(text: l10n.discoverTabSuggestions),
           Tab(text: l10n.favoritesLabel),
           Tab(text: l10n.recentLabel),
-          Tab(text: l10n.yourAudioLabel),
         ],
       ),
     );

@@ -4,6 +4,7 @@ import 'package:login_flutter/data/repositories/audio_generation_repository_impl
 import 'package:login_flutter/domain/repositories/audio_generation_repository.dart';
 import 'package:login_flutter/domain/usecases/generate_audio_usecase.dart';
 import 'package:login_flutter/ui/screen/create_audio/providers/create_audio_state.dart';
+import 'package:login_flutter/ui/screen/my_audios/providers/my_audios_provider.dart';
 
 final audioGenerationRemoteDataSourceProvider =
     Provider<AudioGenerationRemoteDataSource>((ref) {
@@ -26,13 +27,17 @@ final createAudioNotifierProvider =
     StateNotifierProvider.autoDispose<CreateAudioNotifier, CreateAudioState>((
       ref,
     ) {
-      return CreateAudioNotifier(ref.read(generateAudioUseCaseProvider));
+      return CreateAudioNotifier(
+        ref.read(generateAudioUseCaseProvider),
+        ref: ref,
+      );
     });
 
 class CreateAudioNotifier extends StateNotifier<CreateAudioState> {
   final GenerateAudioUseCase generateAudioUseCase;
+  final Ref ref;
 
-  CreateAudioNotifier(this.generateAudioUseCase)
+  CreateAudioNotifier(this.generateAudioUseCase, {required this.ref})
     : super(const CreateAudioState());
 
   void onPromptChanged(String value) {
@@ -96,6 +101,10 @@ class CreateAudioNotifier extends StateNotifier<CreateAudioState> {
         prompt: prompt,
         durationSeconds: state.durationSeconds,
       );
+      
+      // Save it to my audios
+      ref.read(myAudiosProvider.notifier).addAudio(generatedAudio);
+
       state = state.copyWith(
         status: CreateAudioStatus.success,
         generatedAudio: generatedAudio,
