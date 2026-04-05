@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/profile_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/profile/providers/profile_provider.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -30,9 +31,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   void _saveProfile() {
+    final l10n = AppLocalizations.of(context)!;
     final newUsername = _usernameController.text.trim();
-    if (newUsername.isNotEmpty &&
-        newUsername != widget.currentProfile.username) {
+
+    if (newUsername.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.usernameRequired)));
+      return;
+    }
+
+    if (newUsername != widget.currentProfile.username) {
       ref
           .read(profileNotifierProvider.notifier)
           .updateProfileInfo(username: newUsername);
@@ -42,10 +51,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF7F3FB),
       appBar: AppBar(
-        title: const Text('Edit Profile'),
+        title: Text(l10n.editProfileTitle),
         backgroundColor: Colors.transparent,
         foregroundColor: const Color(0xFF20202B),
         elevation: 0,
@@ -58,7 +69,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Change Username',
+                l10n.changeUsername,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -73,7 +84,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   fontWeight: FontWeight.w600,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Enter your username',
+                  hintText: l10n.enterYourUsername,
                   filled: true,
                   fillColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(
@@ -104,9 +115,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                   ),
                   elevation: 2,
                 ),
-                child: const Text(
-                  'Save Changes',
-                  style: TextStyle(
+                child: Text(
+                  l10n.saveChanges,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.1,

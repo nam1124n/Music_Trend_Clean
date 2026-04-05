@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:login_flutter/app/utils/audio_file_picker.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_provider.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_state.dart';
 import 'package:login_flutter/ui/screen/admin/widgets/label_text.dart';
@@ -54,12 +55,13 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
 
     if (_pickedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn ảnh bìa!'),
+        SnackBar(
+          content: Text(l10n.coverImageRequiredMessage),
           backgroundColor: Colors.orange,
         ),
       );
@@ -68,8 +70,8 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
 
     if (_pickedAudio == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn file audio!'),
+        SnackBar(
+          content: Text(l10n.audioFileRequiredMessage),
           backgroundColor: Colors.orange,
         ),
       );
@@ -95,10 +97,10 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
     final state = ref.read(songNotifierProvider);
     if (state is SongActionSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Thao tác thành công!'),
+        SnackBar(
+          content: Text(l10n.actionSuccessMessage),
           backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
       ref.read(songNotifierProvider.notifier).loadSongs();
@@ -106,7 +108,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
     } else if (state is SongError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Lỗi: ${state.message}'),
+          content: Text('${l10n.errorLabel}: ${state.message}'),
           backgroundColor: Colors.red,
         ),
       );
@@ -115,15 +117,19 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = ref.watch(songNotifierProvider);
     final isLoading = state is SongLoading;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text(
-          'Thêm bài hát mới',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        title: Text(
+          l10n.newSongTitle,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: const Color(0xFF8C52FF),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -136,7 +142,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const LabelText('Ảnh bìa'),
+              LabelText(l10n.coverImageLabel),
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: isLoading ? null : _pickImage,
@@ -171,7 +177,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Chọn ảnh bìa',
+                              l10n.chooseCoverImage,
                               style: TextStyle(color: Colors.grey[500]),
                             ),
                           ],
@@ -179,7 +185,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const LabelText('File Audio (mp3, m4a...)'),
+              LabelText(l10n.audioFilePickerLabel),
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: isLoading ? null : _pickAudio,
@@ -214,7 +220,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                         child: Text(
                           _pickedAudio != null
                               ? _pickedAudio!.name
-                              : 'Nhấn để chọn file âm thanh',
+                              : l10n.selectAudioFile,
                           style: TextStyle(
                             color: _pickedAudio != null
                                 ? Colors.black87
@@ -228,25 +234,25 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const LabelText('Tên bài hát'),
+              LabelText(l10n.songTitleLabel),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _titleController,
                 enabled: !isLoading,
-                decoration: _inputDeco('Ví dụ: Hoa Nở Không Màu'),
+                decoration: _inputDeco(l10n.songTitleHint),
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Vui lòng nhập tên bài hát'
+                    ? l10n.songTitleRequiredMessage
                     : null,
               ),
               const SizedBox(height: 20),
-              const LabelText('Tên nghệ sĩ'),
+              LabelText(l10n.artistNameLabel),
               const SizedBox(height: 8),
               TextFormField(
                 controller: _artistController,
                 enabled: !isLoading,
-                decoration: _inputDeco('Ví dụ: Hoài Lâm'),
+                decoration: _inputDeco(l10n.artistNameHint),
                 validator: (v) => v == null || v.trim().isEmpty
-                    ? 'Vui lòng nhập tên nghệ sĩ'
+                    ? l10n.artistNameRequiredMessage
                     : null,
               ),
               const SizedBox(height: 36),
@@ -263,10 +269,10 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                     elevation: 0,
                   ),
                   child: isLoading
-                      ? const Row(
+                      ? Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
@@ -274,13 +280,13 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                                 strokeWidth: 2,
                               ),
                             ),
-                            SizedBox(width: 12),
-                            Text('Đang upload lên Cloudinary...'),
+                            const SizedBox(width: 12),
+                            Text(l10n.uploadingSong),
                           ],
                         )
-                      : const Text(
-                          'Upload & Lưu bài hát',
-                          style: TextStyle(
+                      : Text(
+                          l10n.uploadAndSaveSong,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),

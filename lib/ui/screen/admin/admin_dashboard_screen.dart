@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/admin/admin_song_form_screen.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_provider.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_state.dart';
@@ -11,15 +12,19 @@ class AdminDashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final songState = ref.watch(songNotifierProvider);
     final authState = ref.watch(authNotifierProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text(
-          'Admin Panel — Quản lý bài hát',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        title: Text(
+          l10n.adminPanelTitle,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: const Color(0xFF8C52FF),
         elevation: 0,
@@ -36,7 +41,7 @@ class AdminDashboardScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFF8C52FF),
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
-        label: const Text('Thêm bài hát'),
+        label: Text(l10n.addSongLabel),
         onPressed: () {
           Navigator.push(
             context,
@@ -53,6 +58,8 @@ class AdminDashboardScreen extends ConsumerWidget {
     AuthState authState,
     SongState songState,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (authState is! AuthSuccess ||
         authState.user.email != 'admin@gmail.com') {
       return Center(
@@ -61,16 +68,16 @@ class AdminDashboardScreen extends ConsumerWidget {
           children: [
             const Icon(Icons.lock_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
-            const Text(
-              'Truy cập bị từ chối',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              l10n.accessDeniedTitle,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            const Text('Bạn không có quyền truy cập vào trang này.'),
+            Text(l10n.accessDeniedMessage),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Quay lại'),
+              child: Text(l10n.goBack),
             ),
           ],
         ),
@@ -95,7 +102,7 @@ class AdminDashboardScreen extends ConsumerWidget {
             ElevatedButton(
               onPressed: () =>
                   ref.read(songNotifierProvider.notifier).loadSongs(),
-              child: const Text('Thử lại'),
+              child: Text(l10n.retry),
             ),
           ],
         ),
@@ -104,7 +111,7 @@ class AdminDashboardScreen extends ConsumerWidget {
 
     if (songState is SongLoaded) {
       if (songState.songs.isEmpty) {
-        return _buildEmptyState();
+        return _buildEmptyState(context);
       }
 
       return ListView.separated(
@@ -181,7 +188,9 @@ class AdminDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -199,13 +208,13 @@ class AdminDashboardScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Chưa có bài hát nào',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          Text(
+            l10n.noSongsYetTitle,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            'Nhấn + để thêm bài hát đầu tiên',
+            l10n.noSongsYetSubtitle,
             style: TextStyle(color: Colors.grey[600]),
           ),
         ],
@@ -219,16 +228,18 @@ class AdminDashboardScreen extends ConsumerWidget {
     String id,
     String title,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Xác nhận xoá'),
-        content: Text('Bạn có chắc muốn xoá "$title" không?'),
+        title: Text(l10n.deleteConfirmTitle),
+        content: Text(l10n.deleteSongConfirmMessage(title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: Text('Huỷ', style: TextStyle(color: Colors.grey[600])),
+            child: Text(l10n.cancel, style: TextStyle(color: Colors.grey[600])),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -243,23 +254,26 @@ class AdminDashboardScreen extends ConsumerWidget {
               final songState = ref.read(songNotifierProvider);
               if (songState is SongActionSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Thao tác thành công!'),
+                  SnackBar(
+                    content: Text(l10n.actionSuccessMessage),
                     backgroundColor: Colors.green,
-                    duration: Duration(seconds: 2),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
                 ref.read(songNotifierProvider.notifier).loadSongs();
               } else if (songState is SongError) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Lỗi: ${songState.message}'),
+                    content: Text('${l10n.errorLabel}: ${songState.message}'),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
-            child: const Text('Xoá', style: TextStyle(color: Colors.white)),
+            child: Text(
+              l10n.deleteLabel,
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),

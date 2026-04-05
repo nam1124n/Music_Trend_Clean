@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/app/config/audio_generation_config.dart';
 import 'package:login_flutter/domain/entities/generated_audio_entity.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
 import 'package:login_flutter/ui/screen/create_audio/providers/create_audio_provider.dart';
 import 'package:login_flutter/ui/screen/create_audio/providers/create_audio_state.dart';
@@ -27,6 +28,8 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     ref.listen<CreateAudioState>(createAudioNotifierProvider, (previous, next) {
       if (previous?.status == next.status) {
         return;
@@ -46,8 +49,8 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
       if (next.status == CreateAudioStatus.success &&
           next.generatedAudio != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Audio mock đã được tạo thành công.'),
+          SnackBar(
+            content: Text(l10n.createAudioSuccessMessage),
             backgroundColor: Colors.green,
           ),
         );
@@ -59,9 +62,12 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text(
-          'Tạo Audio AI',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        title: Text(
+          l10n.createAudioTitle,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         backgroundColor: const Color(0xFF8C52FF),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -88,9 +94,9 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Prompt mô tả',
-                      style: TextStyle(
+                    Text(
+                      l10n.promptLabel,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF1F2937),
@@ -105,8 +111,7 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
                           .read(createAudioNotifierProvider.notifier)
                           .onPromptChanged,
                       decoration: InputDecoration(
-                        hintText:
-                            'Ví dụ: Tạo một đoạn nhạc chill lofi, piano nhẹ, mưa đêm thành phố, cảm giác thư giãn.',
+                        hintText: l10n.promptHint,
                         hintStyle: TextStyle(
                           color: Colors.grey[500],
                           height: 1.4,
@@ -133,7 +138,7 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'Prompt càng rõ về mood, nhạc cụ, tempo thì kết quả mock càng dễ thay bằng API thật sau này.',
+                      l10n.promptHelpText,
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,
@@ -141,9 +146,9 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text(
-                      'Thời lượng',
-                      style: TextStyle(
+                    Text(
+                      l10n.durationLabel,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF1F2937),
@@ -156,7 +161,7 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
                       children: _durations.map((seconds) {
                         final isSelected = state.durationSeconds == seconds;
                         return ChoiceChip(
-                          label: Text('$seconds giây'),
+                          label: Text(l10n.secondsLabel(seconds)),
                           selected: isSelected,
                           selectedColor: const Color(0xFFE9DDFF),
                           labelStyle: TextStyle(
@@ -181,7 +186,7 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Text(
-                        'Đang dùng API giả lập với URL: ${AudioGenerationConfig.baseUrl}\nKhi có API thật, chỉ cần đổi URL trong config.',
+                        l10n.mockApiMessage(AudioGenerationConfig.baseUrl),
                         style: const TextStyle(
                           fontSize: 12,
                           height: 1.45,
@@ -198,7 +203,14 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
                             : () {
                                 ref
                                     .read(createAudioNotifierProvider.notifier)
-                                    .generateAudio();
+                                    .generateAudio(
+                                      promptRequiredMessage:
+                                          l10n.promptRequiredMessage,
+                                      promptTooShortMessage:
+                                          l10n.promptTooShortMessage,
+                                      audioDurationRangeMessage:
+                                          l10n.audioDurationRangeMessage,
+                                    );
                               },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF8C52FF),
@@ -219,8 +231,8 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
                             : const Icon(Icons.auto_awesome),
                         label: Text(
                           state.status == CreateAudioStatus.loading
-                              ? 'Đang tạo audio...'
-                              : 'Tạo audio ngắn',
+                              ? l10n.generatingAudio
+                              : l10n.createShortAudio,
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 15,
@@ -250,7 +262,7 @@ class _CreateAudioScreenState extends ConsumerState<CreateAudioScreen> {
     final previewSong = SongEntity(
       id: generatedAudio.id,
       title: generatedAudio.title,
-      artist: 'AI Audio Studio',
+      artist: AppLocalizations.of(context)!.aiAudioStudio,
       audioUrl: generatedAudio.audioUrl,
       imageUrl: generatedAudio.imageUrl,
     );
@@ -272,6 +284,8 @@ class _GeneratedAudioCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -318,7 +332,10 @@ class _GeneratedAudioCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${generatedAudio.durationSeconds} giây • ${generatedAudio.provider}',
+                      l10n.generatedAudioMeta(
+                        generatedAudio.durationSeconds,
+                        generatedAudio.provider,
+                      ),
                       style: TextStyle(color: Colors.grey[600], fontSize: 12),
                     ),
                   ],
@@ -346,9 +363,9 @@ class _GeneratedAudioCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Audio URL mock',
-                  style: TextStyle(
+                Text(
+                  l10n.audioMockUrlLabel,
+                  style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF374151),
                   ),
@@ -379,7 +396,7 @@ class _GeneratedAudioCard extends StatelessWidget {
                     ),
                   ),
                   icon: const Icon(Icons.play_arrow_rounded),
-                  label: const Text('Nghe thử'),
+                  label: Text(l10n.previewAudio),
                 ),
               ),
             ],

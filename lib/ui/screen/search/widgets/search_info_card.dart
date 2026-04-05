@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:login_flutter/domain/entities/search_plan_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 
 class SearchInfoCard extends StatelessWidget {
   final SearchPlanEntity plan;
@@ -8,6 +9,7 @@ class SearchInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final chips = [...plan.keywords, ...plan.artistHints, ...plan.titleHints];
 
     return Container(
@@ -20,7 +22,7 @@ class SearchInfoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Nguon: ${plan.provider.toUpperCase()}'),
+          Text(l10n.searchSourceLabel(plan.provider.toUpperCase())),
           const SizedBox(height: 6),
           Text(plan.reason),
           if (chips.isNotEmpty) const SizedBox(height: 10),

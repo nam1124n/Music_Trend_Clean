@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_state.dart';
 import 'package:login_flutter/ui/screen/auth/forgot_password/forgot_password_screen.dart';
@@ -42,9 +43,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         SnackBar(content: Text(authState.message), backgroundColor: Colors.red),
       );
     } else if (authState is AuthSuccess) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Welcome, ${authState.user.fullName}!'),
+          content: Text(l10n.loginSuccessMessage(authState.user.fullName)),
           backgroundColor: Colors.green,
         ),
       );
@@ -58,6 +60,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -90,10 +93,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                const Text(
-                  'Welcome back',
+                Text(
+                  l10n.welcomeBack,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF111827),
@@ -101,7 +104,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Please enter your details to sign in',
+                  l10n.signInSubtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
@@ -125,9 +128,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Text(
-                        'Email Address',
-                        style: TextStyle(
+                      Text(
+                        l10n.emailAddress,
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF1F2937),
@@ -161,9 +164,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      const Text(
-                        'Password',
-                        style: TextStyle(
+                      Text(
+                        l10n.password,
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF1F2937),
@@ -218,9 +221,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             minimumSize: const Size(0, 0),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          child: const Text(
-                            'Forgot password?',
-                            style: TextStyle(fontWeight: FontWeight.w700),
+                          child: Text(
+                            l10n.forgotPassword,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
                           ),
                         ),
                       ),
@@ -247,16 +250,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               )
                             : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
+                                children: [
                                   Text(
-                                    'Login',
-                                    style: TextStyle(
+                                    l10n.login,
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward, size: 20),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.arrow_forward, size: 20),
                                 ],
                               ),
                       ),
@@ -268,7 +271,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Don\'t have an account? ',
+                      '${l10n.noAccount} ',
                       style: TextStyle(color: Colors.grey[600], fontSize: 14),
                     ),
                     GestureDetector(
@@ -280,9 +283,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         );
                       },
-                      child: const Text(
-                        'Sign up',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.signUp,
+                        style: const TextStyle(
                           color: Color(0xFF9038FF),
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

@@ -17,13 +17,17 @@ class ForgotPasswordNotifier extends StateNotifier<ForgotPasswordState> {
     );
   }
 
-  Future<void> submit() async {
+  Future<void> submit({
+    required String emailRequiredMessage,
+    required String invalidEmailFormatMessage,
+    required String resetPasswordSentMessage,
+  }) async {
     final email = state.email.trim();
 
     if (email.isEmpty) {
       state = state.copyWith(
         status: ForgotPasswordStatus.error,
-        errorMessage: 'Vui lòng nhập email.',
+        errorMessage: emailRequiredMessage,
         successMessage: null,
       );
       return;
@@ -36,7 +40,7 @@ class ForgotPasswordNotifier extends StateNotifier<ForgotPasswordState> {
     if (!isValidEmail) {
       state = state.copyWith(
         status: ForgotPasswordStatus.error,
-        errorMessage: 'Email không đúng định dạng.',
+        errorMessage: invalidEmailFormatMessage,
         successMessage: null,
       );
       return;
@@ -52,7 +56,7 @@ class ForgotPasswordNotifier extends StateNotifier<ForgotPasswordState> {
       await resetPasswordUseCase(email);
       state = state.copyWith(
         status: ForgotPasswordStatus.success,
-        successMessage: 'Email đặt lại mật khẩu đã được gửi.',
+        successMessage: resetPasswordSentMessage,
         errorMessage: null,
       );
     } catch (e) {

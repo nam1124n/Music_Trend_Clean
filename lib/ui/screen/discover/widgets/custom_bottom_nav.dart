@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 
 class CustomBottomNav extends StatelessWidget {
   const CustomBottomNav({
@@ -12,6 +13,8 @@ class CustomBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 65,
       decoration: BoxDecoration(
@@ -29,26 +32,26 @@ class CustomBottomNav extends StatelessWidget {
               index: 0,
               icon: Icons.explore_outlined,
               activeIcon: Icons.explore,
-              label: 'Khám phá',
+              label: l10n.discoverLabel,
             ),
             _buildNavItem(
               index: 1,
               icon: Icons.search_rounded,
               activeIcon: Icons.search_rounded,
-              label: 'Tìm kiếm',
+              label: l10n.searchLabel,
             ),
             const SizedBox(width: 60),
             _buildNavItem(
               index: 2,
               icon: Icons.favorite_border,
               activeIcon: Icons.favorite,
-              label: 'Đã thích',
+              label: l10n.likedTabTitle,
             ),
             _buildNavItem(
               index: 3,
               icon: Icons.person_outline,
               activeIcon: Icons.person,
-              label: 'Cá nhân',
+              label: l10n.profileTitle,
             ),
           ],
         ),

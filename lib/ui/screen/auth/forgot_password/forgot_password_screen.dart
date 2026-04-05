@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/auth/forgot_password/forgot_password_provider.dart';
 import 'package:login_flutter/ui/screen/auth/forgot_password/forgot_password_state.dart';
 
@@ -48,9 +49,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     });
 
     final state = ref.watch(forgotPasswordNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Quên mật khẩu')),
+      appBar: AppBar(title: Text(l10n.forgotPasswordTitle)),
       body: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -61,8 +63,8 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               onChanged: ref
                   .read(forgotPasswordNotifierProvider.notifier)
                   .onEmailChanged,
-              decoration: const InputDecoration(
-                labelText: 'Email',
+              decoration: InputDecoration(
+                labelText: l10n.emailAddress,
                 hintText: 'name@example.com',
               ),
             ),
@@ -73,11 +75,17 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   : () {
                       ref
                           .read(forgotPasswordNotifierProvider.notifier)
-                          .submit();
+                          .submit(
+                            emailRequiredMessage: l10n.emailRequiredMessage,
+                            invalidEmailFormatMessage:
+                                l10n.invalidEmailFormatMessage,
+                            resetPasswordSentMessage:
+                                l10n.resetPasswordSentMessage,
+                          );
                     },
               child: state.status == ForgotPasswordStatus.loading
                   ? const CircularProgressIndicator()
-                  : const Text('Gửi email đặt lại mật khẩu'),
+                  : Text(l10n.sendResetEmail),
             ),
           ],
         ),

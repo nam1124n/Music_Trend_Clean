@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/admin/admin_dashboard_screen.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_state.dart';
@@ -9,6 +10,7 @@ class DiscoverAppBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authNotifierProvider);
     final isAdmin =
         authState is AuthSuccess && authState.user.email == 'admin@gmail.com';
@@ -32,9 +34,9 @@ class DiscoverAppBar extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              const Text(
-                'Khám phá Âm nhạc',
-                style: TextStyle(
+              Text(
+                l10n.musicDiscoveryTitle,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -90,7 +92,7 @@ class DiscoverAppBar extends ConsumerWidget {
             ),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm bài hát, nghệ sĩ hoặc album',
+                hintText: l10n.discoverSearchHint,
                 hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                 prefixIcon: Icon(
                   Icons.search,

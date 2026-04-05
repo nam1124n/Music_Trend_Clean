@@ -1,32 +1,36 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 
 class YourAudioTab extends StatelessWidget {
   const YourAudioTab({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         children: [
           _buildImportCard(
-            title: "Nhập âm thanh từ video",
-            subtitle: "Tự động trích xuất âm thanh từ clip của bạn",
+            title: l10n.importAudioFromVideo,
+            subtitle: l10n.importAudioFromVideoSubtitle,
             icon: Icons.ondemand_video,
-            buttonText: "+ Nhập",
+            buttonText: l10n.importButtonLabel,
             isPrimaryAction: true,
           ),
           const SizedBox(height: 16),
           _buildImportCard(
-            title: "Nhập âm thanh từ thiết bị",
-            subtitle: "Chọn âm thanh chất lượng cao từ máy của bạn",
+            title: l10n.importAudioFromDevice,
+            subtitle: l10n.importAudioFromDeviceSubtitle,
             icon: Icons.folder_open,
-            buttonText: "Duyệt", // Will add custom search prefix inline
+            buttonText: l10n.browseButtonLabel,
             isPrimaryAction: false,
           ),
           const SizedBox(height: 32),
-          _buildEmptyState(),
+          _buildEmptyState(context),
           const SizedBox(height: 140), // Spacing for bottom nav
         ],
       ),
@@ -143,7 +147,7 @@ class YourAudioTab extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Column(
       children: [
         // Dashed border container with icon
@@ -188,9 +192,9 @@ class YourAudioTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        const Text(
-          "Chưa có âm thanh nào",
-          style: TextStyle(
+        Text(
+          AppLocalizations.of(context)!.yourAudioEmptyTitle,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
@@ -200,7 +204,7 @@ class YourAudioTab extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
-            "Nhập âm thanh yêu thích của bạn để bắt đầu sáng tạo. Mọi thứ bạn thêm sẽ xuất hiện tại đây.",
+            AppLocalizations.of(context)!.yourAudioEmptySubtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -221,9 +225,9 @@ class YourAudioTab extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
             ),
           ),
-          child: const Text(
-            "Bắt đầu ngay",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          child: Text(
+            AppLocalizations.of(context)!.getStartedNow,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
           ),
         ),
       ],

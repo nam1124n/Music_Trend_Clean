@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
 import 'package:login_flutter/ui/screen/discover/providers/favorites_provider.dart';
 import 'package:login_flutter/ui/screen/discover/providers/recents_provider.dart';
@@ -11,11 +12,12 @@ class RecentsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final recentSongs = ref.watch(recentNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     if (recentSongs.isEmpty) {
       return Center(
         child: Text(
-          'Chưa có bài hát nghe gần đây',
+          l10n.recentSongsEmpty,
           style: TextStyle(color: Colors.grey.shade600, fontSize: 16),
         ),
       );

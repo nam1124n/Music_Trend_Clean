@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:login_flutter/domain/entities/profile_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 
 class ProfileStats extends StatelessWidget {
   final ProfileEntity profile;
@@ -22,24 +23,26 @@ class ProfileStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         _StatItem(
           value: _formatStat(profile.followers),
-          label: 'Followers',
+          label: l10n.followersLabel,
           textPrimary: textPrimary,
           textMuted: textMuted,
         ),
         _StatItem(
           value: _formatStat(profile.following),
-          label: 'Following',
+          label: l10n.followingLabel,
           textPrimary: textPrimary,
           textMuted: textMuted,
         ),
         _StatItem(
           value: _formatStat(profile.likes),
-          label: 'Likes',
+          label: l10n.likesLabel,
           textPrimary: textPrimary,
           textMuted: textMuted,
         ),

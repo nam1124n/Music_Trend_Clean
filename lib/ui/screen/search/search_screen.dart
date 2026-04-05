@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_provider.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_state.dart';
 import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
@@ -44,6 +45,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final songState = ref.watch(songNotifierProvider);
     final searchState = ref.watch(searchNotifierProvider);
     final songs = songState is SongLoaded ? songState.songs : <SongEntity>[];
+    final l10n = AppLocalizations.of(context)!;
 
     return SafeArea(
       bottom: false,
@@ -55,7 +57,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               controller: _controller,
               onChanged: (value) => _onQueryChanged(value, songs),
               decoration: InputDecoration(
-                hintText: 'Tim bai hat, ca si, mood...',
+                hintText: l10n.searchHint,
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -63,14 +65,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Expanded(child: _buildContent(searchState, songState)),
+            Expanded(child: _buildContent(context, searchState, songState)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildContent(SearchState searchState, SongState songState) {
+  Widget _buildContent(
+    BuildContext context,
+    SearchState searchState,
+    SongState songState,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (songState is SongLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -93,9 +101,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           children: [
             SearchInfoCard(plan: searchState.plan),
             const SizedBox(height: 16),
-            const Expanded(
-              child: Center(child: Text('Khong tim thay bai hat phu hop')),
-            ),
+            Expanded(child: Center(child: Text(l10n.noMatchingSongs))),
           ],
         );
       }
@@ -126,6 +132,6 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       );
     }
 
-    return const Center(child: Text('Nhap cau tim kiem de AI phan tich'));
+    return Center(child: Text(l10n.enterSearchPrompt));
   }
 }

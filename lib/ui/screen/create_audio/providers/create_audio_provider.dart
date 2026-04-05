@@ -51,13 +51,17 @@ class CreateAudioNotifier extends StateNotifier<CreateAudioState> {
     );
   }
 
-  Future<void> generateAudio() async {
+  Future<void> generateAudio({
+    required String promptRequiredMessage,
+    required String promptTooShortMessage,
+    required String audioDurationRangeMessage,
+  }) async {
     final prompt = state.prompt.trim();
 
     if (prompt.isEmpty) {
       state = state.copyWith(
         status: CreateAudioStatus.error,
-        errorMessage: 'Vui lòng nhập prompt để tạo audio.',
+        errorMessage: promptRequiredMessage,
         clearGeneratedAudio: true,
       );
       return;
@@ -66,7 +70,7 @@ class CreateAudioNotifier extends StateNotifier<CreateAudioState> {
     if (prompt.length < 10) {
       state = state.copyWith(
         status: CreateAudioStatus.error,
-        errorMessage: 'Prompt nên có ít nhất 10 ký tự để AI hiểu tốt hơn.',
+        errorMessage: promptTooShortMessage,
         clearGeneratedAudio: true,
       );
       return;
@@ -75,7 +79,7 @@ class CreateAudioNotifier extends StateNotifier<CreateAudioState> {
     if (state.durationSeconds < 5 || state.durationSeconds > 60) {
       state = state.copyWith(
         status: CreateAudioStatus.error,
-        errorMessage: 'Thời lượng audio phải từ 5 đến 60 giây.',
+        errorMessage: audioDurationRangeMessage,
         clearGeneratedAudio: true,
       );
       return;

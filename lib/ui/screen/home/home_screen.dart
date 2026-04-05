@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
 import 'package:login_flutter/ui/screen/create_audio/create_audio_screen.dart';
 import 'package:login_flutter/ui/screen/discover/discover_screen.dart';
@@ -30,19 +31,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
-          DiscoverContent(),
-          SearchScreen(),
+        children: [
+          const DiscoverContent(),
+          const SearchScreen(),
           _PlaceholderTab(
             icon: Icons.favorite_rounded,
-            title: 'Đã thích',
-            description: 'Danh sách bài hát yêu thích sẽ hiển thị tại đây.',
+            title: l10n.likedTabTitle,
+            description: l10n.likedTabDescription,
           ),
-          ProfileScreen(),
+          const ProfileScreen(),
         ],
       ),
       bottomNavigationBar: _HomeBottomBar(

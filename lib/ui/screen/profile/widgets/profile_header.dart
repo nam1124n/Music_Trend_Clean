@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/app/providers/app_language_provider.dart';
+import 'package:login_flutter/app/providers/app_language_state.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_provider.dart';
 import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
@@ -16,6 +19,12 @@ class ProfileHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final languageState = ref.watch(appLanguageNotifierProvider);
+    final currentLanguageCode = languageState is AppLanguageLoaded
+        ? languageState.language.languageCode
+        : 'vi';
+
     return Row(
       children: [
         _HeaderIconButton(
@@ -25,7 +34,7 @@ class ProfileHeader extends ConsumerWidget {
         ),
         Expanded(
           child: Text(
-            'Profile',
+            l10n.profileTitle,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: textPrimary,
@@ -41,6 +50,13 @@ class ProfileHeader extends ConsumerWidget {
           ),
           offset: const Offset(0, 46),
           onSelected: (value) async {
+            if (value == 'vi' || value == 'en') {
+              await ref
+                  .read(appLanguageNotifierProvider.notifier)
+                  .changeLanguage(value);
+              return;
+            }
+
             if (value == 'logout') {
               final confirm = await showDialog<bool>(
                 context: context,
@@ -49,17 +65,17 @@ class ProfileHeader extends ConsumerWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    title: const Text(
-                      'Đăng xuất',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    title: Text(
+                      l10n.logoutTitle,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    content: const Text('Bạn có muốn đăng xuất không?'),
+                    content: Text(l10n.logoutMessage),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(dialogContext).pop(false),
-                        child: const Text(
-                          'Không',
-                          style: TextStyle(color: Colors.grey),
+                        child: Text(
+                          l10n.cancel,
+                          style: const TextStyle(color: Colors.grey),
                         ),
                       ),
                       ElevatedButton(
@@ -71,7 +87,7 @@ class ProfileHeader extends ConsumerWidget {
                           ),
                         ),
                         onPressed: () => Navigator.of(dialogContext).pop(true),
-                        child: const Text('Có'),
+                        child: Text(l10n.confirm),
                       ),
                     ],
                   );
@@ -94,15 +110,41 @@ class ProfileHeader extends ConsumerWidget {
             }
           },
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem<String>(
+              enabled: false,
+              height: 36,
+              child: Text(
+                l10n.language,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF20202B),
+                ),
+              ),
+            ),
+            CheckedPopupMenuItem<String>(
+              value: 'vi',
+              checked: currentLanguageCode == 'vi',
+              child: Text(l10n.vietnamese),
+            ),
+            CheckedPopupMenuItem<String>(
+              value: 'en',
+              checked: currentLanguageCode == 'en',
+              child: Text(l10n.english),
+            ),
+            const PopupMenuDivider(),
+            PopupMenuItem<String>(
               value: 'logout',
               child: Row(
                 children: [
-                  Icon(Icons.logout_rounded, color: Colors.redAccent, size: 20),
-                  SizedBox(width: 10),
+                  const Icon(
+                    Icons.logout_rounded,
+                    color: Colors.redAccent,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
                   Text(
-                    'Đăng xuất',
-                    style: TextStyle(
+                    l10n.logout,
+                    style: const TextStyle(
                       color: Colors.redAccent,
                       fontWeight: FontWeight.w600,
                     ),

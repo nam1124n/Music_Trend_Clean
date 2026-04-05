@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 
 class DiscoverTabBar extends StatelessWidget {
   final TabController tabController;
@@ -7,6 +8,8 @@ class DiscoverTabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Align(
       alignment: Alignment.centerLeft,
       child: TabBar(
@@ -23,11 +26,11 @@ class DiscoverTabBar extends StatelessWidget {
           fontWeight: FontWeight.normal,
         ),
         tabAlignment: TabAlignment.start,
-        tabs: const [
-          Tab(text: "Gợi ý"),
-          Tab(text: "Yêu thích"),
-          Tab(text: "Gần đây"),
-          Tab(text: "Âm thanh của bạn"),
+        tabs: [
+          Tab(text: l10n.discoverTabSuggestions),
+          Tab(text: l10n.favoritesLabel),
+          Tab(text: l10n.recentLabel),
+          Tab(text: l10n.yourAudioLabel),
         ],
       ),
     );

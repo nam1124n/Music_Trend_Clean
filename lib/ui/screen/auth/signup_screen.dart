@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_state.dart';
 
@@ -27,13 +28,14 @@ class _SignUpWidgetState extends ConsumerState<SignupScreen> {
   }
 
   Future<void> _signUp() async {
+    final l10n = AppLocalizations.of(context)!;
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
 
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Passwords do not match'),
+        SnackBar(
+          content: Text(l10n.passwordsDoNotMatch),
           backgroundColor: Colors.red,
         ),
       );
@@ -60,7 +62,7 @@ class _SignUpWidgetState extends ConsumerState<SignupScreen> {
     } else if (authState is AuthSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Account created for ${authState.user.fullName}!'),
+          content: Text(l10n.signUpSuccessMessage(authState.user.fullName)),
           backgroundColor: Colors.green,
         ),
       );
@@ -72,6 +74,7 @@ class _SignUpWidgetState extends ConsumerState<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(authNotifierProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -86,10 +89,10 @@ class _SignUpWidgetState extends ConsumerState<SignupScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 24),
-                const Text(
-                  'Create Account',
+                Text(
+                  l10n.createAccountTitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
                     color: Color(0xFF111827),
@@ -97,7 +100,7 @@ class _SignUpWidgetState extends ConsumerState<SignupScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Join us to get started with your journey.',
+                  l10n.createAccountSubtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
@@ -121,11 +124,11 @@ class _SignUpWidgetState extends ConsumerState<SignupScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _buildLabel('FULL NAME'),
+                      _buildLabel(l10n.fullNameLabel.toUpperCase()),
                       const SizedBox(height: 8),
                       _buildTextField('John Doe', false, _nameController),
                       const SizedBox(height: 20),
-                      _buildLabel('EMAIL ADDRESS'),
+                      _buildLabel(l10n.emailAddress.toUpperCase()),
                       const SizedBox(height: 8),
                       _buildTextField(
                         'name@example.com',
@@ -133,11 +136,11 @@ class _SignUpWidgetState extends ConsumerState<SignupScreen> {
                         _emailController,
                       ),
                       const SizedBox(height: 20),
-                      _buildLabel('PASSWORD'),
+                      _buildLabel(l10n.password.toUpperCase()),
                       const SizedBox(height: 8),
                       _buildTextField('••••••••', true, _passwordController),
                       const SizedBox(height: 20),
-                      _buildLabel('CONFIRM PASSWORD'),
+                      _buildLabel(l10n.confirmPasswordLabel.toUpperCase()),
                       const SizedBox(height: 8),
                       _buildTextField(
                         '••••••••',
@@ -165,9 +168,9 @@ class _SignUpWidgetState extends ConsumerState<SignupScreen> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text(
-                                'Sign Up',
-                                style: TextStyle(
+                            : Text(
+                                l10n.signUp,
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -181,16 +184,16 @@ class _SignUpWidgetState extends ConsumerState<SignupScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Already have an account? ',
+                      '${l10n.alreadyHaveAccount} ',
                       style: TextStyle(color: Colors.grey[600], fontSize: 14),
                     ),
                     GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      child: const Text(
-                        'Back to Login',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.backToLogin,
+                        style: const TextStyle(
                           color: Color(0xFF9038FF),
                           fontSize: 14,
                           fontWeight: FontWeight.bold,

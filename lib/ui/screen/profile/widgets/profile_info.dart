@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:login_flutter/domain/entities/profile_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/profile/providers/profile_provider.dart';
 
 class ProfileInfo extends ConsumerWidget {
@@ -30,6 +31,8 @@ class ProfileInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         GestureDetector(
@@ -136,7 +139,7 @@ class ProfileInfo extends ConsumerWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'ID: ${profile.id}',
+          l10n.profileIdLabel(profile.id),
           style: TextStyle(
             color: textMuted.withValues(alpha: 0.9),
             fontSize: 12,

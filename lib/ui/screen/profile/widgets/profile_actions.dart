@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:login_flutter/domain/entities/profile_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/profile/edit_profile_screen.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -17,6 +18,8 @@ class ProfileActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Row(
       children: [
         Expanded(
@@ -50,10 +53,10 @@ class ProfileActions extends StatelessWidget {
                     ),
                   );
                 },
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'Edit Profile',
-                    style: TextStyle(
+                    l10n.editProfileButton,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -84,15 +87,15 @@ class ProfileActions extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(18),
                 onTap: () {
-                  final shareText =
-                      'Check out ${profile.username}\'s beautiful profile on Music Trend App! '
-                      'They already have ${profile.followers} followers.\n'
-                      'Download the app to listen to great music together!';
+                  final shareText = l10n.profileShareMessage(
+                    profile.username,
+                    profile.followers,
+                  );
                   SharePlus.instance.share(ShareParams(text: shareText));
                 },
                 child: Center(
                   child: Text(
-                    'Share',
+                    l10n.shareButton,
                     style: TextStyle(
                       color: textPrimary,
                       fontSize: 15,

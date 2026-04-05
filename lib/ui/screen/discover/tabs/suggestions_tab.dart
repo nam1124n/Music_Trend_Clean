@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
 import 'package:login_flutter/domain/entities/trending_song_entity.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_provider.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_state.dart';
 import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
@@ -53,16 +54,18 @@ class SuggestionsTab extends ConsumerWidget {
     WidgetRef ref,
     List<SongEntity> songs,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 16, 16, 12),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             child: Text(
-              'Thịnh hành',
-              style: TextStyle(
+              l10n.trendingTitle,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
@@ -70,22 +73,22 @@ class SuggestionsTab extends ConsumerWidget {
             ),
           ),
           _buildTrendingSection(ref),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Dành cho bạn',
-                  style: TextStyle(
+                  l10n.forYouTitle,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                 ),
                 Text(
-                  'Từ Firestore',
-                  style: TextStyle(
+                  l10n.fromFirestore,
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Color(0xFF8C52FF),
                     fontWeight: FontWeight.w600,
@@ -121,6 +124,7 @@ class SuggestionsTab extends ConsumerWidget {
         final trendingSongs = snapshot.data ?? const <TrendingSongEntity>[];
 
         if (trendingSongs.isEmpty) {
+          final l10n = AppLocalizations.of(context)!;
           return Container(
             height: 160,
             margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -139,17 +143,17 @@ class SuggestionsTab extends ConsumerWidget {
                   color: Color(0xFF8C52FF),
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Chưa có đủ lượt nghe để xếp hạng tuần này',
+                Text(
+                  l10n.trendingEmptyTitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Top 4 sẽ tự cập nhật khi người dùng nghe đủ thời lượng.',
+                  l10n.trendingEmptySubtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                 ),
@@ -171,6 +175,7 @@ class SuggestionsTab extends ConsumerWidget {
                   _trendingPalettes[index % _trendingPalettes.length];
 
               return _buildTrendingCard(
+                context: context,
                 trendingSong: trendingSong,
                 colors: colors,
               );
@@ -182,6 +187,7 @@ class SuggestionsTab extends ConsumerWidget {
   }
 
   Widget _buildTrendingCard({
+    required BuildContext context,
     required TrendingSongEntity trendingSong,
     required List<Color> colors,
   }) {
@@ -224,7 +230,7 @@ class SuggestionsTab extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildTrendingStats(trendingSong),
+                _buildTrendingStats(context, trendingSong),
                 const Spacer(),
                 Text(
                   song.title,
@@ -254,18 +260,25 @@ class SuggestionsTab extends ConsumerWidget {
     );
   }
 
-  Widget _buildTrendingStats(TrendingSongEntity trendingSong) {
+  Widget _buildTrendingStats(
+    BuildContext context,
+    TrendingSongEntity trendingSong,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
         _buildStatChip(
           icon: Icons.people_alt_outlined,
-          label: '${_formatCount(trendingSong.uniqueUserCount)} người nghe',
+          label: l10n.listenersCount(
+            _formatCount(trendingSong.uniqueUserCount),
+          ),
         ),
         _buildStatChip(
           icon: Icons.headphones_outlined,
-          label: '${_formatCount(trendingSong.totalPlayCount)} lượt nghe',
+          label: l10n.playsCount(_formatCount(trendingSong.totalPlayCount)),
         ),
       ],
     );
@@ -423,7 +436,7 @@ class SuggestionsTab extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Audio tu Firestore',
+                          AppLocalizations.of(context)!.firestoreAudioLabel,
                           style: TextStyle(
                             color: Colors.grey.shade400,
                             fontSize: 12,
@@ -497,42 +510,48 @@ class SuggestionsTab extends ConsumerWidget {
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: const BoxDecoration(
-                color: Color(0xFFF3E8FF),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.library_music_outlined,
-                size: 56,
-                color: Color(0xFF8C52FF),
-              ),
+    return Builder(
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF3E8FF),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.library_music_outlined,
+                    size: 56,
+                    color: Color(0xFF8C52FF),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  l10n.noSongDataTitle,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.noSongDataSubtitle,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey.shade600, height: 1.5),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            const Text(
-              'Chua co du lieu bai hat',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Them bai hat trong Firestore hoac tu trang admin de giao dien nay hien du lieu that.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600, height: 1.5),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/profile/providers/profile_provider.dart';
 import 'package:login_flutter/ui/screen/profile/providers/profile_state.dart';
 import 'package:login_flutter/ui/screen/profile/widgets/profile_actions.dart';
@@ -43,20 +44,22 @@ class ProfileContent extends ConsumerWidget {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 430),
-            child: _buildBody(state),
+            child: _buildBody(context, state),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildBody(ProfileState state) {
+  Widget _buildBody(BuildContext context, ProfileState state) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (state is ProfileLoading || state is ProfileInitial) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (state is ProfileError) {
-      return Center(child: Text('Error: ${state.message}'));
+      return Center(child: Text('${l10n.errorLabel}: ${state.message}'));
     }
 
     if (state is ProfileLoaded) {
@@ -108,6 +111,8 @@ class _LibraryTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
       decoration: BoxDecoration(
@@ -115,23 +120,23 @@ class _LibraryTabs extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
       ),
       child: Row(
-        children: const [
+        children: [
           Expanded(
             child: _LibraryTabItem(
-              label: 'Playlists',
+              label: l10n.playlistsLabel,
               icon: Icons.grid_view_rounded,
               isActive: true,
             ),
           ),
           Expanded(
             child: _LibraryTabItem(
-              label: 'Recent',
+              label: l10n.recentLabel,
               icon: Icons.schedule_rounded,
             ),
           ),
           Expanded(
             child: _LibraryTabItem(
-              label: 'Favorites',
+              label: l10n.favoritesLabel,
               icon: Icons.favorite_rounded,
             ),
           ),
@@ -184,6 +189,8 @@ class _FeaturedPlaylistCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 162,
       decoration: BoxDecoration(
@@ -285,7 +292,7 @@ class _FeaturedPlaylistCard extends StatelessWidget {
               left: 22,
               bottom: 16,
               child: Text(
-                '42 Tracks',
+                l10n.trackCount(42),
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.78),
                   fontSize: 12,
@@ -646,6 +653,8 @@ class _CreatePlaylistButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       height: 56,
       decoration: BoxDecoration(
@@ -674,7 +683,7 @@ class _CreatePlaylistButton extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                'CREATE NEW PLAYLIST',
+                l10n.createNewPlaylist.toUpperCase(),
                 style: TextStyle(
                   color: ProfileScreen._textMuted,
                   fontSize: 11,
