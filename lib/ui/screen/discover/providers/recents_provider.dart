@@ -1,46 +1,42 @@
-import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
+import 'package:login_flutter/domain/repositories/interaction_repository.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:login_flutter/ui/screen/discover/providers/favorites_provider.dart';
 
 final recentNotifierProvider =
     StateNotifierProvider<RecentNotifier, List<SongEntity>>((ref) {
       final authState = ref.watch(authNotifierProvider);
       final userId = authState is AuthSuccess ? authState.user.id : 'guest';
-      return RecentNotifier(userId);
+      return RecentNotifier(
+        userId: userId,
+        repository: ref.read(interactionRepositoryProvider),
+      );
     });
 
 class RecentNotifier extends StateNotifier<List<SongEntity>> {
   final String userId;
+  final InteractionRepository repository;
 
-  RecentNotifier(this.userId) : super([]) {
-    _loadRecents();
-  }
-
-  String get _key => 'recent_songs_$userId';
-
-  Future<void> _loadRecents() async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = prefs.getStringList(_key);
-    if (jsonList != null && jsonList.isNotEmpty) {
-      try {
-        final loaded = jsonList
-            .map((str) => SongEntity.fromJson(jsonDecode(str)))
-            .toList();
-        state = loaded;
-      } catch (_) {}
+  RecentNotifier({required this.userId, required this.repository}) : super([]) {
+    if (userId != 'guest') {
+      _loadRecents();
     }
   }
 
-  Future<void> _saveRecents(List<SongEntity> songs) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jsonList = songs.map((s) => jsonEncode(s.toJson())).toList();
-    await prefs.setStringList(_key, jsonList);
+  Future<void> _loadRecents() async {
+    try {
+      final loaded = await repository.getRecents(userId);
+      state = loaded;
+    } catch (_) {
+      // Ignored
+    }
   }
 
-  void addRecent(SongEntity song) {
+  Future<void> addRecent(SongEntity song) async {
+    if (userId == 'guest') return;
+
     final currentList = List<SongEntity>.from(state);
 
     // Remove if already exists so it can be moved to the top
@@ -49,12 +45,16 @@ class RecentNotifier extends StateNotifier<List<SongEntity>> {
     // Insert at index 0 (top of the list)
     currentList.insert(0, song);
 
-    // Keep only last 20 recents, optional limitation to avoid giant string
+    // Keep only last 20 recents locally for UI
     if (currentList.length > 20) {
       currentList.removeLast();
     }
 
     state = currentList;
-    _saveRecents(currentList);
+    try {
+      await repository.addRecent(userId, song);
+    } catch (_) {
+      // Background save error ignored to keep UI smooth
+    }
   }
 }

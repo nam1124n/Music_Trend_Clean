@@ -10,7 +10,7 @@ final myAudiosProvider =
       final authState = ref.watch(authNotifierProvider);
       final userId = authState is AuthSuccess ? authState.user.id : 'guest';
       return MyAudiosNotifier(userId);
-});
+    });
 
 class MyAudiosNotifier extends StateNotifier<List<GeneratedAudioEntity>> {
   final String userId;

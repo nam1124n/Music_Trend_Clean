@@ -101,7 +101,7 @@ class CreateAudioNotifier extends StateNotifier<CreateAudioState> {
         prompt: prompt,
         durationSeconds: state.durationSeconds,
       );
-      
+
       // Save it to my audios
       ref.read(myAudiosProvider.notifier).addAudio(generatedAudio);
 

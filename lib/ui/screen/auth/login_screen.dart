@@ -7,6 +7,14 @@ import 'package:login_flutter/ui/screen/auth/forgot_password/forgot_password_scr
 import 'package:login_flutter/ui/screen/auth/signup_screen.dart';
 import 'package:login_flutter/ui/screen/home/home_screen.dart';
 
+import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
+import 'package:login_flutter/ui/screen/discover/providers/favorites_provider.dart';
+import 'package:login_flutter/ui/screen/discover/providers/recents_provider.dart';
+import 'package:login_flutter/ui/screen/search/providers/search_provider.dart';
+import 'package:login_flutter/ui/screen/admin/providers/song_provider.dart';
+import 'package:login_flutter/ui/screen/profile/providers/profile_provider.dart';
+import 'package:login_flutter/ui/screen/my_audios/providers/my_audios_provider.dart';
+
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -50,6 +58,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           backgroundColor: Colors.green,
         ),
       );
+
+      // Invalidate session providers to ensure fresh data load for the new user session
+      // This defends against stale state from the previous user or transitions.
+      ref.invalidate(audioPlayerNotifierProvider);
+      ref.invalidate(favoriteNotifierProvider);
+      ref.invalidate(recentNotifierProvider);
+      ref.invalidate(searchNotifierProvider);
+      ref.invalidate(songNotifierProvider);
+      ref.invalidate(profileNotifierProvider);
+      ref.invalidate(myAudiosProvider);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),

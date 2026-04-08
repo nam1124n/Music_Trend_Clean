@@ -24,7 +24,9 @@ class GeneratedAudioEntity {
       prompt: json['prompt']?.toString() ?? '',
       audioUrl: json['audioUrl']?.toString() ?? '',
       imageUrl: json['imageUrl']?.toString() ?? '',
-      durationSeconds: json['durationSeconds'] is int ? json['durationSeconds'] : int.tryParse(json['durationSeconds']?.toString() ?? '0') ?? 0,
+      durationSeconds: json['durationSeconds'] is int
+          ? json['durationSeconds']
+          : int.tryParse(json['durationSeconds']?.toString() ?? '0') ?? 0,
       provider: json['provider']?.toString() ?? 'Suno',
     );
   }

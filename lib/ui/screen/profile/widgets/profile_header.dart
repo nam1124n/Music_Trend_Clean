@@ -98,7 +98,7 @@ class ProfileHeader extends ConsumerWidget {
               if (confirm == true && context.mounted) {
                 // Actually clear Firebase session
                 await FirebaseAuth.instance.signOut();
-                
+
                 ref.invalidate(audioPlayerNotifierProvider);
                 ref.invalidate(favoriteNotifierProvider);
                 ref.invalidate(recentNotifierProvider);

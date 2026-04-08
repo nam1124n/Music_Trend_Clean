@@ -152,13 +152,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importAudioFromVideo => 'Import audio from video';
 
   @override
-  String get importAudioFromVideoSubtitle => 'Automatically extract audio from your clips';
+  String get importAudioFromVideoSubtitle =>
+      'Automatically extract audio from your clips';
 
   @override
   String get importAudioFromDevice => 'Import audio from device';
 
   @override
-  String get importAudioFromDeviceSubtitle => 'Choose high-quality audio from your device';
+  String get importAudioFromDeviceSubtitle =>
+      'Choose high-quality audio from your device';
 
   @override
   String get importButtonLabel => '+ Import';
@@ -170,7 +172,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get yourAudioEmptyTitle => 'No audio yet';
 
   @override
-  String get yourAudioEmptySubtitle => 'Import your favorite audio to start creating. Everything you add will appear here.';
+  String get yourAudioEmptySubtitle =>
+      'Import your favorite audio to start creating. Everything you add will appear here.';
 
   @override
   String get getStartedNow => 'Get started now';
@@ -194,7 +197,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trendingEmptyTitle => 'Not enough listens to rank this week';
 
   @override
-  String get trendingEmptySubtitle => 'The top 4 will update automatically when users listen long enough.';
+  String get trendingEmptySubtitle =>
+      'The top 4 will update automatically when users listen long enough.';
 
   @override
   String listenersCount(String count) {
@@ -213,7 +217,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noSongDataTitle => 'No song data available';
 
   @override
-  String get noSongDataSubtitle => 'Add songs in Firestore or from the admin page to show real data here.';
+  String get noSongDataSubtitle =>
+      'Add songs in Firestore or from the admin page to show real data here.';
 
   @override
   String get searchHint => 'Search songs, artists, mood...';
@@ -242,13 +247,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalidEmailFormatMessage => 'Invalid email format.';
 
   @override
-  String get resetPasswordSentMessage => 'The password reset email has been sent.';
+  String get resetPasswordSentMessage =>
+      'The password reset email has been sent.';
 
   @override
   String get createAccountTitle => 'Create Account';
 
   @override
-  String get createAccountSubtitle => 'Join us to get started with your journey.';
+  String get createAccountSubtitle =>
+      'Join us to get started with your journey.';
 
   @override
   String get fullNameLabel => 'Full Name';
@@ -280,10 +287,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get promptLabel => 'Description Prompt';
 
   @override
-  String get promptHint => 'Example: Create a chill lofi music piece with soft piano, city-night rain, and a relaxing mood.';
+  String get promptHint =>
+      'Example: Create a chill lofi music piece with soft piano, city-night rain, and a relaxing mood.';
 
   @override
-  String get promptHelpText => 'The clearer the prompt is about mood, instruments, and tempo, the easier it will be to replace the mock result with a real API later.';
+  String get promptHelpText =>
+      'The clearer the prompt is about mood, instruments, and tempo, the easier it will be to replace the mock result with a real API later.';
 
   @override
   String get durationLabel => 'Duration';
@@ -319,13 +328,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get previewAudio => 'Preview';
 
   @override
-  String get promptRequiredMessage => 'Please enter a prompt to generate audio.';
+  String get promptRequiredMessage =>
+      'Please enter a prompt to generate audio.';
 
   @override
-  String get promptTooShortMessage => 'The prompt should be at least 10 characters so the AI can understand it better.';
+  String get promptTooShortMessage =>
+      'The prompt should be at least 10 characters so the AI can understand it better.';
 
   @override
-  String get audioDurationRangeMessage => 'Audio duration must be between 5 and 60 seconds.';
+  String get audioDurationRangeMessage =>
+      'Audio duration must be between 5 and 60 seconds.';
 
   @override
   String get adminPanelTitle => 'Admin Panel — Song Management';
@@ -337,7 +349,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accessDeniedTitle => 'Access denied';
 
   @override
-  String get accessDeniedMessage => 'You do not have permission to access this page.';
+  String get accessDeniedMessage =>
+      'You do not have permission to access this page.';
 
   @override
   String get goBack => 'Go back';

@@ -9,6 +9,7 @@ import 'package:login_flutter/ui/screen/profile/widgets/profile_actions.dart';
 import 'package:login_flutter/ui/screen/profile/widgets/profile_header.dart';
 import 'package:login_flutter/ui/screen/profile/widgets/profile_info.dart';
 import 'package:login_flutter/ui/screen/profile/widgets/profile_stats.dart';
+import 'package:login_flutter/ui/screen/auth/login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -59,6 +60,79 @@ class ProfileContent extends ConsumerWidget {
     }
 
     if (state is ProfileError) {
+      final isAuthError =
+          state.message.toLowerCase().contains('đăng nhập') ||
+          state.message.toLowerCase().contains('login') ||
+          state.message.toLowerCase().contains('auth');
+
+      if (isAuthError) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: ProfileScreen._primary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.person_off_rounded,
+                  size: 64,
+                  color: ProfileScreen._primary,
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Chưa đăng nhập',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: ProfileScreen._textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Vui lòng đăng nhập để xem và tùy chỉnh hồ sơ cá nhân của bạn.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: ProfileScreen._textMuted,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ProfileScreen._primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 48,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Đăng nhập ngay',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
       return Center(child: Text('${l10n.errorLabel}: ${state.message}'));
     }
 

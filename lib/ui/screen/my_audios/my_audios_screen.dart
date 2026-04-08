@@ -42,7 +42,11 @@ class MyAudiosScreen extends ConsumerWidget {
                         color: const Color(0xFFEDE4FF),
                         borderRadius: BorderRadius.circular(28),
                       ),
-                      child: const Icon(Icons.music_note_rounded, size: 36, color: Color(0xFF8C52FF)),
+                      child: const Icon(
+                        Icons.music_note_rounded,
+                        size: 36,
+                        color: Color(0xFF8C52FF),
+                      ),
                     ),
                     const SizedBox(height: 20),
                     Text(
@@ -94,13 +98,15 @@ class _AudioItemCard extends ConsumerWidget {
       imageUrl: audio.imageUrl,
     );
 
-    ref.read(audioPlayerNotifierProvider.notifier).playSong(previewSong, playlist: [previewSong]);
+    ref
+        .read(audioPlayerNotifierProvider.notifier)
+        .playSong(previewSong, playlist: [previewSong]);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return InkWell(
       onTap: () => _playAudio(context, ref),
       borderRadius: BorderRadius.circular(16),
@@ -168,22 +174,42 @@ class _AudioItemCard extends ConsumerWidget {
             ),
             const SizedBox(width: 4),
             IconButton(
-              icon: const Icon(Icons.close_rounded, color: Colors.grey, size: 20),
+              icon: const Icon(
+                Icons.close_rounded,
+                color: Colors.grey,
+                size: 20,
+              ),
               onPressed: () async {
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('Xóa âm thanh', style: TextStyle(fontWeight: FontWeight.bold)),
-                    content: Text('Bạn có chắc chắn muốn xóa "${audio.title}" khỏi danh sách?'),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    title: const Text(
+                      'Xóa âm thanh',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    content: Text(
+                      'Bạn có chắc chắn muốn xóa "${audio.title}" khỏi danh sách?',
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+                        child: const Text(
+                          'Hủy',
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ),
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(true),
-                        child: const Text('Xóa', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                        child: const Text(
+                          'Xóa',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
