@@ -4,6 +4,7 @@ import 'package:login_flutter/l10n/app_localizations.dart';
 import 'package:login_flutter/ui/screen/admin/admin_dashboard_screen.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_state.dart';
+import 'package:login_flutter/ui/screen/search/search_screen.dart';
 
 class DiscoverAppBar extends ConsumerWidget {
   const DiscoverAppBar({super.key});
@@ -84,23 +85,33 @@ class DiscoverAppBar extends ConsumerWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Container(
-            height: 44,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
+          child: Material(
+            color: const Color(0xFFF3F4F6),
+            borderRadius: BorderRadius.circular(22),
+            child: InkWell(
               borderRadius: BorderRadius.circular(22),
-            ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: l10n.discoverSearchHint,
-                hintStyle: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey.shade500,
-                  size: 20,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SearchScreen()),
+                );
+              },
+              child: Container(
+                height: 44,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Row(
+                  children: [
+                    Icon(Icons.search, color: Colors.grey.shade500, size: 20),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.discoverSearchHint,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 13),
               ),
             ),
           ),

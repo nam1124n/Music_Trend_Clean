@@ -36,9 +36,9 @@ class CustomBottomNav extends StatelessWidget {
             ),
             _buildNavItem(
               index: 1,
-              icon: Icons.search_rounded,
-              activeIcon: Icons.search_rounded,
-              label: l10n.searchLabel,
+              icon: Icons.category_outlined,
+              activeIcon: Icons.category_rounded,
+              label: l10n.genreLabel,
             ),
             const SizedBox(width: 60),
             _buildNavItem(

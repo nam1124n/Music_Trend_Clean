@@ -47,26 +47,42 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final songs = songState is SongLoaded ? songState.songs : <SongEntity>[];
     final l10n = AppLocalizations.of(context)!;
 
-    return SafeArea(
-      bottom: false,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _controller,
-              onChanged: (value) => _onQueryChanged(value, songs),
-              decoration: InputDecoration(
-                hintText: l10n.searchHint,
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        surfaceTintColor: Colors.white,
+        title: Text(
+          l10n.searchLabel,
+          style: const TextStyle(
+            color: Color(0xFF111827),
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              TextField(
+                controller: _controller,
+                onChanged: (value) => _onQueryChanged(value, songs),
+                decoration: InputDecoration(
+                  hintText: l10n.searchHint,
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(child: _buildContent(context, searchState, songState)),
-          ],
+              const SizedBox(height: 16),
+              Expanded(child: _buildContent(context, searchState, songState)),
+            ],
+          ),
         ),
       ),
     );

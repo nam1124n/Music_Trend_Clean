@@ -33,6 +33,12 @@ class AiConfig {
     defaultValue: 'gpt-oss:20b-cloud',
   );
 
+  static int get maxPredictTokens =>
+      const int.fromEnvironment('OLLAMA_MAX_PREDICT_TOKENS', defaultValue: 64);
+
+  static String get keepAlive =>
+      const String.fromEnvironment('OLLAMA_KEEP_ALIVE', defaultValue: '10m');
+
   static int get timeoutSeconds =>
-      const int.fromEnvironment('OLLAMA_TIMEOUT_SECONDS', defaultValue: 30);
+      const int.fromEnvironment('OLLAMA_TIMEOUT_SECONDS', defaultValue: 60);
 }

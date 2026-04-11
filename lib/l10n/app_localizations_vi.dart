@@ -68,8 +68,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get likedTabTitle => 'Đã thích';
 
   @override
-  String get likedTabDescription =>
-      'Danh sách bài hát yêu thích sẽ hiển thị tại đây.';
+  String get likedTabDescription => 'Danh sách bài hát yêu thích sẽ hiển thị tại đây.';
 
   @override
   String get editProfileTitle => 'Chỉnh sửa hồ sơ';
@@ -90,6 +89,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get searchLabel => 'Tìm kiếm';
 
   @override
+  String get genreLabel => 'Thể loại';
+
+  @override
   String get discoverLabel => 'Khám phá';
 
   @override
@@ -97,6 +99,12 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get discoverSearchHint => 'Tìm kiếm bài hát, nghệ sĩ hoặc album';
+
+  @override
+  String get genreScreenTitle => 'Thể loại nhạc';
+
+  @override
+  String get genreScreenSubtitle => 'Chọn nhanh một nhóm nhạc phổ biến để khám phá nội dung phù hợp.';
 
   @override
   String get playlistsLabel => 'Danh sách phát';
@@ -153,15 +161,13 @@ class AppLocalizationsVi extends AppLocalizations {
   String get importAudioFromVideo => 'Nhập âm thanh từ video';
 
   @override
-  String get importAudioFromVideoSubtitle =>
-      'Tự động trích xuất âm thanh từ clip của bạn';
+  String get importAudioFromVideoSubtitle => 'Tự động trích xuất âm thanh từ clip của bạn';
 
   @override
   String get importAudioFromDevice => 'Nhập âm thanh từ thiết bị';
 
   @override
-  String get importAudioFromDeviceSubtitle =>
-      'Chọn âm thanh chất lượng cao từ máy của bạn';
+  String get importAudioFromDeviceSubtitle => 'Chọn âm thanh chất lượng cao từ máy của bạn';
 
   @override
   String get importButtonLabel => '+ Nhập';
@@ -173,8 +179,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get yourAudioEmptyTitle => 'Chưa có âm thanh nào';
 
   @override
-  String get yourAudioEmptySubtitle =>
-      'Nhập âm thanh yêu thích của bạn để bắt đầu sáng tạo. Mọi thứ bạn thêm sẽ xuất hiện tại đây.';
+  String get yourAudioEmptySubtitle => 'Nhập âm thanh yêu thích của bạn để bắt đầu sáng tạo. Mọi thứ bạn thêm sẽ xuất hiện tại đây.';
 
   @override
   String get getStartedNow => 'Bắt đầu ngay';
@@ -198,8 +203,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get trendingEmptyTitle => 'Chưa có đủ lượt nghe để xếp hạng tuần này';
 
   @override
-  String get trendingEmptySubtitle =>
-      'Top 4 sẽ tự cập nhật khi người dùng nghe đủ thời lượng.';
+  String get trendingEmptySubtitle => 'Top 4 sẽ tự cập nhật khi người dùng nghe đủ thời lượng.';
 
   @override
   String listenersCount(String count) {
@@ -218,8 +222,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get noSongDataTitle => 'Chưa có dữ liệu bài hát';
 
   @override
-  String get noSongDataSubtitle =>
-      'Thêm bài hát trong Firestore hoặc từ trang admin để giao diện này hiển thị dữ liệu thật.';
+  String get noSongDataSubtitle => 'Thêm bài hát trong Firestore hoặc từ trang admin để giao diện này hiển thị dữ liệu thật.';
 
   @override
   String get searchHint => 'Tìm bài hát, ca sĩ, mood...';
@@ -286,12 +289,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get promptLabel => 'Prompt mô tả';
 
   @override
-  String get promptHint =>
-      'Ví dụ: Tạo một đoạn nhạc chill lofi, piano nhẹ, mưa đêm thành phố, cảm giác thư giãn.';
+  String get promptHint => 'Ví dụ: Tạo một đoạn nhạc chill lofi, piano nhẹ, mưa đêm thành phố, cảm giác thư giãn.';
 
   @override
-  String get promptHelpText =>
-      'Prompt càng rõ về mood, nhạc cụ, tempo thì kết quả mock càng dễ thay bằng API thật sau này.';
+  String get promptHelpText => 'Prompt càng rõ về mood, nhạc cụ, tempo thì kết quả mock càng dễ thay bằng API thật sau này.';
 
   @override
   String get durationLabel => 'Thời lượng';
@@ -330,12 +331,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get promptRequiredMessage => 'Vui lòng nhập prompt để tạo audio.';
 
   @override
-  String get promptTooShortMessage =>
-      'Prompt nên có ít nhất 10 ký tự để AI hiểu tốt hơn.';
+  String get promptTooShortMessage => 'Prompt nên có ít nhất 10 ký tự để AI hiểu tốt hơn.';
 
   @override
-  String get audioDurationRangeMessage =>
-      'Thời lượng audio phải từ 5 đến 60 giây.';
+  String get audioDurationRangeMessage => 'Thời lượng audio phải từ 5 đến 60 giây.';
 
   @override
   String get adminPanelTitle => 'Admin Panel — Quản lý bài hát';
@@ -347,8 +346,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get accessDeniedTitle => 'Truy cập bị từ chối';
 
   @override
-  String get accessDeniedMessage =>
-      'Bạn không có quyền truy cập vào trang này.';
+  String get accessDeniedMessage => 'Bạn không có quyền truy cập vào trang này.';
 
   @override
   String get goBack => 'Quay lại';

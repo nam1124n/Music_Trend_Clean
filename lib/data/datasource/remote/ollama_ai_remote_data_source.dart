@@ -19,13 +19,15 @@ class OllamaAiRemoteDataSource {
               'model': model,
               'stream': true,
               'format': 'json',
-              'options': {'temperature': 0, 'num_predict': 160},
+              'keep_alive': AiConfig.keepAlive,
+              'options': {
+                'temperature': 0,
+                'num_predict': AiConfig.maxPredictTokens,
+              },
               'prompt':
-                  'Ban la bo phan phan tich truy van tim nhac. '
-                  'Chi tra ve duy nhat mot JSON object hop le voi 4 truong: '
-                  'keywords, artistHints, titleHints, reason. '
-                  'Khong them bat ky van ban nao ngoai JSON. '
-                  'Phan tich cau tim kiem nay: "$query".',
+                  'Phan tich truy van tim nhac va tra ve duy nhat mot JSON hop le '
+                  'voi 4 truong: keywords, artistHints, titleHints, reason. '
+                  'Khong them van ban khac. Query: "$query".',
             });
 
       final response = await client
