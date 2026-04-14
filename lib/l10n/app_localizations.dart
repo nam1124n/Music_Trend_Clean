@@ -278,13 +278,13 @@ abstract class AppLocalizations {
   /// No description provided for @genreScreenTitle.
   ///
   /// In en, this message translates to:
-  /// **'Music Genres'**
+  /// **'Memories by Year'**
   String get genreScreenTitle;
 
   /// No description provided for @genreScreenSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Browse common music groups in a simple and clear way.'**
+  /// **'Songs you save are grouped by year so they are easier to revisit without visual clutter.'**
   String get genreScreenSubtitle;
 
   /// No description provided for @playlistsLabel.
@@ -506,7 +506,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search songs, artists, mood...'**
+  /// **'Search songs, artists, mood, trends...'**
   String get searchHint;
 
   /// No description provided for @noMatchingSongs.
@@ -844,6 +844,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter the artist name'**
   String get artistNameRequiredMessage;
+
+  /// No description provided for @songTagsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendation Tags'**
+  String get songTagsLabel;
+
+  /// No description provided for @songTagsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: sad, chill, heartbreak, ballad'**
+  String get songTagsHint;
+
+  /// No description provided for @songTagsHelperText.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter short tags separated by commas. Focus on mood, vibe, genre, or listening context.'**
+  String get songTagsHelperText;
+
+  /// No description provided for @searchAliasesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Aliases'**
+  String get searchAliasesLabel;
+
+  /// No description provided for @searchAliasesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: sad TikTok song, viral chorus clip'**
+  String get searchAliasesHint;
+
+  /// No description provided for @searchAliasesHelperText.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this for how users remember the song through trends, hook lines, or informal names.'**
+  String get searchAliasesHelperText;
+
+  /// No description provided for @energyLevelLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy Level'**
+  String get energyLevelLabel;
+
+  /// No description provided for @energyLevelHelperText.
+  ///
+  /// In en, this message translates to:
+  /// **'1 is very soft/chill, 5 is intense/high-energy. Old records default to level 3.'**
+  String get energyLevelHelperText;
 
   /// No description provided for @uploadingSong.
   ///

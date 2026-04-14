@@ -10,7 +10,12 @@ class SearchInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final chips = [...plan.keywords, ...plan.artistHints, ...plan.titleHints];
+    final chips = [
+      ...plan.keywords,
+      ...plan.artistHints,
+      ...plan.titleHints,
+      ...plan.tagHints,
+    ];
 
     return Container(
       padding: const EdgeInsets.all(14),

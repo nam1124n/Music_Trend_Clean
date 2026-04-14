@@ -54,6 +54,7 @@ class AiSearchRepositoryImpl implements AiSearchRepository {
         keywords: query.toLowerCase().split(' '),
         artistHints: const [],
         titleHints: const [],
+        tagHints: const [],
         provider: 'rule',
         reason: _buildFallbackReason(
           localError: localError,
@@ -77,6 +78,7 @@ class AiSearchRepositoryImpl implements AiSearchRepository {
       keywords: readList('keywords'),
       artistHints: readList('artistHints'),
       titleHints: readList('titleHints'),
+      tagHints: readList('tagHints'),
       provider: provider,
       reason: data['reason']?.toString() ?? '',
     );

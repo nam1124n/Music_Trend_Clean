@@ -101,10 +101,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverSearchHint => 'Search songs, artists or albums';
 
   @override
-  String get genreScreenTitle => 'Music Genres';
+  String get genreScreenTitle => 'Memories by Year';
 
   @override
-  String get genreScreenSubtitle => 'Browse common music groups in a simple and clear way.';
+  String get genreScreenSubtitle => 'Songs you save are grouped by year so they are easier to revisit without visual clutter.';
 
   @override
   String get playlistsLabel => 'Playlists';
@@ -225,7 +225,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noSongDataSubtitle => 'Add songs in Firestore or from the admin page to show real data here.';
 
   @override
-  String get searchHint => 'Search songs, artists, mood...';
+  String get searchHint => 'Search songs, artists, mood, trends...';
 
   @override
   String get noMatchingSongs => 'No matching songs found';
@@ -406,6 +406,30 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get artistNameRequiredMessage => 'Please enter the artist name';
+
+  @override
+  String get songTagsLabel => 'Recommendation Tags';
+
+  @override
+  String get songTagsHint => 'Example: sad, chill, heartbreak, ballad';
+
+  @override
+  String get songTagsHelperText => 'Enter short tags separated by commas. Focus on mood, vibe, genre, or listening context.';
+
+  @override
+  String get searchAliasesLabel => 'Search Aliases';
+
+  @override
+  String get searchAliasesHint => 'Example: sad TikTok song, viral chorus clip';
+
+  @override
+  String get searchAliasesHelperText => 'Use this for how users remember the song through trends, hook lines, or informal names.';
+
+  @override
+  String get energyLevelLabel => 'Energy Level';
+
+  @override
+  String get energyLevelHelperText => '1 is very soft/chill, 5 is intense/high-energy. Old records default to level 3.';
 
   @override
   String get uploadingSong => 'Uploading to Cloudinary...';

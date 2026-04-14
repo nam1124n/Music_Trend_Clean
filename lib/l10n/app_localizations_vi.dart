@@ -101,10 +101,10 @@ class AppLocalizationsVi extends AppLocalizations {
   String get discoverSearchHint => 'Tìm kiếm bài hát, nghệ sĩ hoặc album';
 
   @override
-  String get genreScreenTitle => 'Thể loại nhạc';
+  String get genreScreenTitle => 'Ký ức theo năm';
 
   @override
-  String get genreScreenSubtitle => 'Chọn nhanh một nhóm nhạc phổ biến để khám phá nội dung phù hợp.';
+  String get genreScreenSubtitle => 'Những bài hát bạn lưu sẽ được gom lại theo từng năm để dễ nghe lại và giữ cảm xúc gọn gàng hơn.';
 
   @override
   String get playlistsLabel => 'Danh sách phát';
@@ -225,7 +225,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get noSongDataSubtitle => 'Thêm bài hát trong Firestore hoặc từ trang admin để giao diện này hiển thị dữ liệu thật.';
 
   @override
-  String get searchHint => 'Tìm bài hát, ca sĩ, mood...';
+  String get searchHint => 'Tìm bài hát, ca sĩ, mood, trend...';
 
   @override
   String get noMatchingSongs => 'Không tìm thấy bài hát phù hợp';
@@ -406,6 +406,30 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get artistNameRequiredMessage => 'Vui lòng nhập tên nghệ sĩ';
+
+  @override
+  String get songTagsLabel => 'Tag gợi ý';
+
+  @override
+  String get songTagsHint => 'Ví dụ: buồn, chill, thất tình, ballad';
+
+  @override
+  String get songTagsHelperText => 'Nhập các tag ngắn, cách nhau bằng dấu phẩy. Ưu tiên mood, vibe, genre hoặc ngữ cảnh nghe nhạc.';
+
+  @override
+  String get searchAliasesLabel => 'Tên gọi dễ tìm';
+
+  @override
+  String get searchAliasesHint => 'Ví dụ: nhạc tiktok buồn, đoạn điệp khúc viral';
+
+  @override
+  String get searchAliasesHelperText => 'Dùng cho cách người dùng hay nhớ bài theo trend, câu hook hoặc tên gọi không chính thức.';
+
+  @override
+  String get energyLevelLabel => 'Mức năng lượng';
+
+  @override
+  String get energyLevelHelperText => '1 là rất nhẹ/chill, 5 là mạnh/sôi động. Dữ liệu cũ sẽ mặc định ở mức 3.';
 
   @override
   String get uploadingSong => 'Đang upload lên Cloudinary...';

@@ -64,10 +64,11 @@ Dự án này gồm 2 luồng chính:
 
 - Người dùng nhập truy vấn như tên bài hát, ca sĩ, mood, chủ đề.
 - App gửi truy vấn sang Ollama để phân tích.
-- Kết quả AI trả về 4 nhóm dữ liệu:
+- Kết quả AI trả về 5 nhóm dữ liệu:
   - `keywords`
   - `artistHints`
   - `titleHints`
+  - `tagHints`
   - `reason`
 - Sau đó app tự chấm điểm từng bài hát trong danh sách hiện có để đưa ra kết quả.
 
@@ -88,6 +89,7 @@ Cơ chế fallback hiện tại:
   - ảnh bìa được upload lên Cloudinary
   - file audio được upload lên Cloudinary
   - metadata bài hát được lưu vào Firestore
+  - admin có thể bổ sung `semanticTags`, `searchAliases`, `energyLevel` để AI search gợi ý đúng hơn
 
 ### 7. Hồ sơ người dùng
 
@@ -205,6 +207,37 @@ Mỗi document bài hát hiện có các field chính:
 - `artist`
 - `audioUrl`
 - `imageUrl`
+- `semanticTags`
+- `searchAliases`
+- `energyLevel`
+
+### Backfill metadata cho dữ liệu cũ
+
+Repo có sẵn script CLI để suy đoán tag cơ bản cho các bài hát cũ từ `title` và `artist`, rồi cập nhật Firestore qua REST API.
+
+Chạy thử trước ở chế độ dry-run:
+
+```bash
+dart run tool/backfill_song_metadata.dart \
+  --email admin@gmail.com \
+  --password YOUR_PASSWORD \
+  --limit 20
+```
+
+Khi kết quả ổn, thêm `--apply` để ghi thật:
+
+```bash
+dart run tool/backfill_song_metadata.dart \
+  --email admin@gmail.com \
+  --password YOUR_PASSWORD \
+  --apply
+```
+
+Các điểm an toàn:
+
+- Mặc định script chỉ dry-run, không ghi dữ liệu.
+- Mặc định script chỉ điền `semanticTags` và `energyLevel` khi document còn thiếu.
+- Nếu muốn ghi đè metadata đã có, dùng thêm cờ `--overwrite`.
 
 #### `users`
 

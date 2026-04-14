@@ -7,16 +7,13 @@ class SongModel extends SongEntity {
     required super.artist,
     required super.audioUrl,
     required super.imageUrl,
+    super.semanticTags = const [],
+    super.searchAliases = const [],
+    super.energyLevel = 3,
   });
 
   factory SongModel.fromFirestore(Map<String, dynamic> map, String id) {
-    return SongModel(
-      id: id,
-      title: map['title'] ?? '',
-      artist: map['artist'] ?? '',
-      audioUrl: map['audioUrl'] ?? '',
-      imageUrl: map['imageUrl'] ?? '',
-    );
+    return SongModel.fromEntity(SongEntity.fromJson({...map, 'id': id}));
   }
 
   Map<String, dynamic> toMap() => {
@@ -24,6 +21,9 @@ class SongModel extends SongEntity {
     'artist': artist,
     'audioUrl': audioUrl,
     'imageUrl': imageUrl,
+    'semanticTags': semanticTags,
+    'searchAliases': searchAliases,
+    'energyLevel': energyLevel,
   };
 
   factory SongModel.fromEntity(SongEntity entity) => SongModel(
@@ -32,5 +32,8 @@ class SongModel extends SongEntity {
     artist: entity.artist,
     audioUrl: entity.audioUrl,
     imageUrl: entity.imageUrl,
+    semanticTags: entity.semanticTags,
+    searchAliases: entity.searchAliases,
+    energyLevel: entity.energyLevel,
   );
 }

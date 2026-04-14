@@ -26,7 +26,10 @@ class OllamaAiRemoteDataSource {
               },
               'prompt':
                   'Phan tich truy van tim nhac va tra ve duy nhat mot JSON hop le '
-                  'voi 4 truong: keywords, artistHints, titleHints, reason. '
+                  'voi 5 truong: keywords, artistHints, titleHints, tagHints, reason. '
+                  'tagHints dung cho mood, vibe, genre, boi canh nghe nhac hoac trend ngan '
+                  'nhu buon, chill, that tinh, tiktok, study, remix. '
+                  'Loai bo tu dem khong can thiet. Moi mang chi chua cum tu ngan, viet thuong. '
                   'Khong them van ban khac. Query: "$query".',
             });
 
@@ -53,6 +56,7 @@ class OllamaAiRemoteDataSource {
         'keywords': _readList(data['keywords']),
         'artistHints': _readList(data['artistHints']),
         'titleHints': _readList(data['titleHints']),
+        'tagHints': _readList(data['tagHints']),
         'reason': data['reason']?.toString().trim() ?? '',
       };
     } finally {
