@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+OTP_BIN="${HOME}/.elixir-install/installs/otp/28.1/bin"
+ELIXIR_BIN="${HOME}/.elixir-install/installs/elixir/1.19.5-otp-28/bin"
+
+if [[ -d "${OTP_BIN}" && -d "${ELIXIR_BIN}" ]]; then
+  export PATH="${OTP_BIN}:${ELIXIR_BIN}:${PATH}"
+fi
+
+export MIX_HOME="${ROOT_DIR}/.mix"
+export HEX_HOME="${ROOT_DIR}/.hex"
+
+cd "${ROOT_DIR}"
+exec "$@"
