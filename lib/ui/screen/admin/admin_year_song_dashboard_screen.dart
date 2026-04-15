@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/l10n/app_localizations.dart';
-import 'package:login_flutter/ui/screen/admin/admin_song_form_screen.dart';
-import 'package:login_flutter/ui/screen/admin/admin_year_song_dashboard_screen.dart';
-import 'package:login_flutter/ui/screen/admin/providers/song_provider.dart';
+import 'package:login_flutter/ui/screen/admin/admin_year_song_form_screen.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_state.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
 import 'package:login_flutter/ui/screen/auth/providers/auth_state.dart';
+import 'package:login_flutter/ui/screen/genre/providers/year_song_provider.dart';
 
-class AdminDashboardScreen extends ConsumerWidget {
-  const AdminDashboardScreen({super.key});
+class AdminYearSongDashboardScreen extends ConsumerWidget {
+  const AdminYearSongDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final songState = ref.watch(songNotifierProvider);
+    final songState = ref.watch(yearSongNotifierProvider);
     final authState = ref.watch(authNotifierProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         title: Text(
-          l10n.adminPanelTitle,
+          l10n.yearSongAdminTitle,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -33,45 +32,22 @@ class AdminDashboardScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () =>
-                ref.read(songNotifierProvider.notifier).loadSongs(),
+                ref.read(yearSongNotifierProvider.notifier).loadSongs(),
           ),
         ],
       ),
       body: _buildBody(context, ref, authState, songState),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton.extended(
-            heroTag: 'admin-year-song-dashboard',
-            backgroundColor: Colors.white,
-            foregroundColor: const Color(0xFF8C52FF),
-            icon: const Icon(Icons.calendar_month_outlined),
-            label: Text(l10n.genreLabel),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const AdminYearSongDashboardScreen(),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 12),
-          FloatingActionButton.extended(
-            heroTag: 'admin-add-song',
-            backgroundColor: const Color(0xFF8C52FF),
-            foregroundColor: Colors.white,
-            icon: const Icon(Icons.add),
-            label: Text(l10n.addSongLabel),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const AdminSongFormScreen()),
-              );
-            },
-          ),
-        ],
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF8C52FF),
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: Text(l10n.addYearSongLabel),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminYearSongFormScreen()),
+          );
+        },
       ),
     );
   }
@@ -125,7 +101,7 @@ class AdminDashboardScreen extends ConsumerWidget {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () =>
-                  ref.read(songNotifierProvider.notifier).loadSongs(),
+                  ref.read(yearSongNotifierProvider.notifier).loadSongs(),
               child: Text(l10n.retry),
             ),
           ],
@@ -144,6 +120,8 @@ class AdminDashboardScreen extends ConsumerWidget {
         separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
           final song = songState.songs[index];
+          final yearLabel = song.savedAt?.year.toString() ?? '';
+
           return Container(
             decoration: BoxDecoration(
               color: Colors.white,
@@ -181,7 +159,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                 ),
               ),
               subtitle: Text(
-                song.artist,
+                yearLabel.isEmpty ? song.artist : '${song.artist} • $yearLabel',
                 style: TextStyle(color: Colors.grey[600], fontSize: 13),
               ),
               trailing: Row(
@@ -197,7 +175,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) =>
-                              AdminSongFormScreen(initialSong: song),
+                              AdminYearSongFormScreen(initialSong: song),
                         ),
                       );
                     },
@@ -246,20 +224,21 @@ class AdminDashboardScreen extends ConsumerWidget {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.library_music_outlined,
+              Icons.calendar_month_outlined,
               size: 64,
               color: Color(0xFF8C52FF),
             ),
           ),
           const SizedBox(height: 24),
           Text(
-            l10n.noSongsYetTitle,
+            l10n.yearSongEmptyTitle,
             style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            l10n.noSongsYetSubtitle,
+            l10n.yearSongEmptySubtitle,
             style: TextStyle(color: Colors.grey[600]),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -279,7 +258,7 @@ class AdminDashboardScreen extends ConsumerWidget {
       builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(l10n.deleteConfirmTitle),
-        content: Text(l10n.deleteSongConfirmMessage(title)),
+        content: Text(l10n.deleteYearSongConfirmMessage(title)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
@@ -289,13 +268,13 @@ class AdminDashboardScreen extends ConsumerWidget {
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
               Navigator.pop(dialogCtx);
-              await ref.read(songNotifierProvider.notifier).deleteSong(id);
+              await ref.read(yearSongNotifierProvider.notifier).deleteSong(id);
 
               if (!context.mounted) {
                 return;
               }
 
-              final songState = ref.read(songNotifierProvider);
+              final songState = ref.read(yearSongNotifierProvider);
               if (songState is SongActionSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -304,7 +283,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                     duration: const Duration(seconds: 2),
                   ),
                 );
-                ref.read(songNotifierProvider.notifier).loadSongs();
+                ref.read(yearSongNotifierProvider.notifier).loadSongs();
               } else if (songState is SongError) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

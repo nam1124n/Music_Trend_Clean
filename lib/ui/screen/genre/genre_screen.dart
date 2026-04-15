@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
 import 'package:login_flutter/l10n/app_localizations.dart';
+import 'package:login_flutter/ui/screen/admin/providers/song_state.dart';
 import 'package:login_flutter/ui/screen/audio/providers/audio_player_provider.dart';
-import 'package:login_flutter/ui/screen/discover/providers/favorites_provider.dart';
-import 'package:login_flutter/ui/screen/discover/providers/recents_provider.dart';
+import 'package:login_flutter/ui/screen/audio/providers/audio_player_state.dart';
+import 'package:login_flutter/ui/screen/genre/providers/year_song_provider.dart';
 
 class GenreScreen extends ConsumerStatefulWidget {
   const GenreScreen({super.key});
@@ -14,7 +15,10 @@ class GenreScreen extends ConsumerStatefulWidget {
 }
 
 class _GenreScreenState extends ConsumerState<GenreScreen> {
-  static const List<int> _years = [2025, 2024, 2023, 2022];
+  static final List<int> _years = List<int>.generate(
+    9,
+    (index) => 2026 - index,
+  );
   static const Color _purple = Color(0xFF7B43F3);
   static const Color _purpleDark = Color(0xFF4C1D95);
   static const Color _background = Color(0xFFF7F2FF);
@@ -26,15 +30,8 @@ class _GenreScreenState extends ConsumerState<GenreScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isVietnamese = Localizations.localeOf(context).languageCode == 'vi';
-    final favoriteSongs = ref.watch(favoriteNotifierProvider);
+    final yearSongState = ref.watch(yearSongNotifierProvider);
     final playerState = ref.watch(audioPlayerNotifierProvider);
-    final songsByYear = _groupSongsByYear(favoriteSongs);
-    final autoSelectedYear = _preferredYear(songsByYear);
-    final selectedYear = _didSelectYear ? _selectedYear : autoSelectedYear;
-    final selectedSongs = songsByYear[selectedYear] ?? const <SongEntity>[];
-    final yearsWithMemories = _years
-        .where((year) => (songsByYear[year] ?? const []).isNotEmpty)
-        .length;
 
     return Scaffold(
       backgroundColor: _background,
@@ -81,63 +78,13 @@ class _GenreScreenState extends ConsumerState<GenreScreen> {
             ),
             SafeArea(
               top: false,
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-                children: [
-                  _HeaderCard(
-                    title: l10n.genreScreenTitle,
-                    subtitle: l10n.genreScreenSubtitle,
-                    selectedYear: selectedYear,
-                    totalSongs: favoriteSongs.length,
-                    yearsWithMemories: yearsWithMemories,
-                    isVietnamese: isVietnamese,
-                  ),
-                  const SizedBox(height: 22),
-                  _buildYearTabs(selectedYear),
-                  const SizedBox(height: 20),
-                  _SectionHeader(
-                    title: _yearListTitle(selectedYear, isVietnamese),
-                    subtitle: _yearListSubtitle(
-                      selectedYear: selectedYear,
-                      songCount: selectedSongs.length,
-                      hasFavorites: favoriteSongs.isNotEmpty,
-                      isVietnamese: isVietnamese,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  if (selectedSongs.isEmpty)
-                    _EmptyStateCard(
-                      title: _emptyStateTitle(
-                        hasFavorites: favoriteSongs.isNotEmpty,
-                        selectedYear: selectedYear,
-                        isVietnamese: isVietnamese,
-                      ),
-                      subtitle: _emptyStateSubtitle(
-                        hasFavorites: favoriteSongs.isNotEmpty,
-                        isVietnamese: isVietnamese,
-                      ),
-                    )
-                  else
-                    ...selectedSongs.map(
-                      (song) => Padding(
-                        padding: const EdgeInsets.only(bottom: 14),
-                        child: _SongMemoryCard(
-                          song: song,
-                          note: _memoryNote(song, isVietnamese),
-                          isPlaying:
-                              playerState.currentSong?.id == song.id &&
-                              playerState.isPlaying,
-                          isLoading:
-                              playerState.currentSong?.id == song.id &&
-                              playerState.isLoading,
-                          onPlayPressed: () => _handlePlayAction(
-                            song: song,
-                            playlist: selectedSongs,
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
+              child: _buildContent(
+                context: context,
+                ref: ref,
+                l10n: l10n,
+                isVietnamese: isVietnamese,
+                songState: yearSongState,
+                playerState: playerState,
               ),
             ),
           ],
@@ -146,16 +93,130 @@ class _GenreScreenState extends ConsumerState<GenreScreen> {
     );
   }
 
+  Widget _buildContent({
+    required BuildContext context,
+    required WidgetRef ref,
+    required AppLocalizations l10n,
+    required bool isVietnamese,
+    required SongState songState,
+    required AudioPlayerState playerState,
+  }) {
+    if (songState is SongLoading || songState is SongInitial) {
+      return const Center(
+        child: CircularProgressIndicator(color: Color(0xFF7B43F3)),
+      );
+    }
+
+    if (songState is SongError) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.error_outline, size: 56, color: Colors.red),
+              const SizedBox(height: 12),
+              Text(songState.message, textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () =>
+                    ref.read(yearSongNotifierProvider.notifier).loadSongs(),
+                child: Text(l10n.retry),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final songs = songState is SongLoaded
+        ? songState.songs
+        : const <SongEntity>[];
+    final songsByYear = _groupSongsByYear(songs);
+    final autoSelectedYear = _preferredYear(songsByYear);
+    final selectedYear = _didSelectYear ? _selectedYear : autoSelectedYear;
+    final selectedSongs = songsByYear[selectedYear] ?? const <SongEntity>[];
+    final yearsWithSongs = _years
+        .where((year) => (songsByYear[year] ?? const []).isNotEmpty)
+        .length;
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+      children: [
+        _HeaderCard(
+          title: l10n.genreScreenTitle,
+          subtitle: l10n.genreScreenSubtitle,
+          selectedYear: selectedYear,
+          totalSongs: songs.length,
+          yearsWithMemories: yearsWithSongs,
+          totalYears: _years.length,
+          isVietnamese: isVietnamese,
+        ),
+        const SizedBox(height: 22),
+        _buildYearTabs(selectedYear),
+        const SizedBox(height: 20),
+        _SectionHeader(
+          title: _yearListTitle(selectedYear, isVietnamese),
+          subtitle: _yearListSubtitle(
+            selectedYear: selectedYear,
+            songCount: selectedSongs.length,
+            hasSongs: songs.isNotEmpty,
+            isVietnamese: isVietnamese,
+          ),
+        ),
+        const SizedBox(height: 14),
+        if (selectedSongs.isEmpty)
+          _EmptyStateCard(
+            title: _emptyStateTitle(
+              hasSongs: songs.isNotEmpty,
+              selectedYear: selectedYear,
+              isVietnamese: isVietnamese,
+            ),
+            subtitle: _emptyStateSubtitle(
+              hasSongs: songs.isNotEmpty,
+              isVietnamese: isVietnamese,
+            ),
+          )
+        else
+          ...selectedSongs.map(
+            (song) => Padding(
+              padding: const EdgeInsets.only(bottom: 14),
+              child: _SongMemoryCard(
+                song: song,
+                note: _memoryNote(selectedYear, isVietnamese),
+                isPlaying:
+                    playerState.currentSong?.id == song.id &&
+                    playerState.isPlaying,
+                isLoading:
+                    playerState.currentSong?.id == song.id &&
+                    playerState.isLoading,
+                onPlayPressed: () =>
+                    _handlePlayAction(song: song, playlist: selectedSongs),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _buildYearTabs(int selectedYear) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: _years.map((year) {
+    return SizedBox(
+      height: 56,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(
+          parent: AlwaysScrollableScrollPhysics(),
+        ),
+        itemCount: _years.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final year = _years[index];
           final isSelected = year == selectedYear;
 
-          return Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: GestureDetector(
+          return Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
               onTap: () {
                 setState(() {
                   _selectedYear = year;
@@ -189,18 +250,20 @@ class _GenreScreenState extends ConsumerState<GenreScreen> {
                     ),
                   ],
                 ),
-                child: Text(
-                  '$year',
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : _purpleDark,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
+                child: Center(
+                  child: Text(
+                    '$year',
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : _purpleDark,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
               ),
             ),
           );
-        }).toList(),
+        },
       ),
     );
   }
@@ -222,7 +285,6 @@ class _GenreScreenState extends ConsumerState<GenreScreen> {
     }
 
     await playerNotifier.playSong(song, playlist: playlist);
-    await ref.read(recentNotifierProvider.notifier).addRecent(song);
   }
 
   Map<int, List<SongEntity>> _groupSongsByYear(List<SongEntity> songs) {
@@ -258,103 +320,69 @@ class _GenreScreenState extends ConsumerState<GenreScreen> {
   }
 
   String _yearListTitle(int year, bool isVietnamese) {
-    return isVietnamese ? 'Đã lưu trong $year' : 'Saved in $year';
+    return isVietnamese
+        ? 'Những bài gợi nhớ $year'
+        : 'Tracks that bring back $year';
   }
 
   String _yearListSubtitle({
     required int selectedYear,
     required int songCount,
-    required bool hasFavorites,
+    required bool hasSongs,
     required bool isVietnamese,
   }) {
-    if (!hasFavorites) {
+    if (!hasSongs) {
       return isVietnamese
-          ? 'Những bài bạn thả tim sẽ xuất hiện ở đây theo từng năm.'
-          : 'Songs you save will appear here, grouped by year.';
+          ? 'Kho nhạc theo năm sẽ hiện ở đây sau khi admin thêm dữ liệu.'
+          : 'The by-year archive will appear here after the admin adds songs.';
     }
 
     if (songCount == 0) {
       return isVietnamese
-          ? 'Năm $selectedYear hiện chưa có bài hát nào được lưu.'
-          : 'No songs are saved in $selectedYear yet.';
+          ? 'Chưa có bài nào được gắn với năm $selectedYear.'
+          : 'No songs are assigned to $selectedYear yet.';
     }
 
     return isVietnamese
-        ? '$songCount bài hát được giữ lại như một cột mốc nghe nhạc.'
-        : '$songCount songs kept as snapshots from that year.';
+        ? '$songCount bài đang được xếp vào mốc năm $selectedYear.'
+        : '$songCount tracks are currently grouped under $selectedYear.';
   }
 
   String _emptyStateTitle({
-    required bool hasFavorites,
+    required bool hasSongs,
     required int selectedYear,
     required bool isVietnamese,
   }) {
-    if (!hasFavorites) {
+    if (!hasSongs) {
       return isVietnamese
-          ? 'Chưa có kỷ niệm âm nhạc nào'
-          : 'No music memories yet';
+          ? 'Kho nhạc theo năm đang trống'
+          : 'The by-year archive is empty';
     }
 
     return isVietnamese
-        ? 'Năm $selectedYear vẫn đang trống'
-        : '$selectedYear is still empty';
+        ? 'Năm $selectedYear chưa có bài nào'
+        : '$selectedYear does not have any songs yet';
   }
 
   String _emptyStateSubtitle({
-    required bool hasFavorites,
+    required bool hasSongs,
     required bool isVietnamese,
   }) {
-    if (!hasFavorites) {
+    if (!hasSongs) {
       return isVietnamese
-          ? 'Lưu bài hát bạn thích để tự tạo một archive nghe lại theo từng năm.'
-          : 'Save the songs you love to start building a year-by-year archive.';
+          ? 'Admin có thể thêm nhạc ngắn theo từng năm từ 2018 đến 2026.'
+          : 'The admin can add short tracks for each year from 2018 to 2026.';
     }
 
     return isVietnamese
-        ? 'Thử chuyển sang một năm khác để mở lại những bài hát bạn đã giữ.'
-        : 'Try another year tab to revisit the songs you have kept.';
+        ? 'Thử chuyển sang một năm khác để nghe lại những bài đã được lưu.'
+        : 'Try another year tab to revisit the tracks already archived.';
   }
 
-  String _memoryNote(SongEntity song, bool isVietnamese) {
-    final tags = song.semanticTags.map((tag) => tag.toLowerCase()).toList();
-
-    if (tags.any(
-      (tag) =>
-          tag.contains('chill') ||
-          tag.contains('lo-fi') ||
-          tag.contains('lofi') ||
-          tag.contains('acoustic'),
-    )) {
-      return isVietnamese
-          ? 'Giai điệu giữ mọi thứ dịu xuống vừa đủ.'
-          : 'The track that kept everything calm enough.';
-    }
-
-    if (tags.any(
-      (tag) =>
-          tag.contains('sad') || tag.contains('buon') || tag.contains('ballad'),
-    )) {
-      return isVietnamese
-          ? 'Một bài hát thường quay lại vào những đêm yên hơn.'
-          : 'A song that kept coming back on quieter nights.';
-    }
-
-    if (song.energyLevel >= 4 ||
-        tags.any(
-          (tag) =>
-              tag.contains('edm') ||
-              tag.contains('rock') ||
-              tag.contains('rap') ||
-              tag.contains('dance'),
-        )) {
-      return isVietnamese
-          ? 'Bản nhạc kéo tâm trạng lên ngay từ vài giây đầu.'
-          : 'The one that lifted the mood in just a few seconds.';
-    }
-
+  String _memoryNote(int selectedYear, bool isVietnamese) {
     return isVietnamese
-        ? 'Một ca khúc bạn đã giữ lại cho rất nhiều lần nghe sau đó.'
-        : 'A song you kept around for many listens after that.';
+        ? 'Một đoạn nhạc ngắn gợi lại không khí của $selectedYear.'
+        : 'A short track that brings back the feel of $selectedYear.';
   }
 }
 
@@ -365,6 +393,7 @@ class _HeaderCard extends StatelessWidget {
     required this.selectedYear,
     required this.totalSongs,
     required this.yearsWithMemories,
+    required this.totalYears,
     required this.isVietnamese,
   });
 
@@ -373,6 +402,7 @@ class _HeaderCard extends StatelessWidget {
   final int selectedYear;
   final int totalSongs;
   final int yearsWithMemories;
+  final int totalYears;
   final bool isVietnamese;
 
   @override
@@ -455,12 +485,12 @@ class _HeaderCard extends StatelessWidget {
             runSpacing: 10,
             children: [
               _StatChip(
-                label: isVietnamese ? 'Bài đã lưu' : 'Saved songs',
+                label: isVietnamese ? 'Bài hiện có' : 'Tracks available',
                 value: '$totalSongs',
               ),
               _StatChip(
-                label: isVietnamese ? 'Năm có kỷ niệm' : 'Active years',
-                value: '$yearsWithMemories/4',
+                label: isVietnamese ? 'Năm có dữ liệu' : 'Active years',
+                value: '$yearsWithMemories/$totalYears',
               ),
             ],
           ),

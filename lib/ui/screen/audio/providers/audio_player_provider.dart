@@ -135,7 +135,7 @@ class AudioPlayerNotifier extends StateNotifier<AudioPlayerState> {
     }
 
     final song = state.currentSong;
-    if (song == null) {
+    if (song == null || !song.trackInWeeklyStats) {
       return;
     }
 

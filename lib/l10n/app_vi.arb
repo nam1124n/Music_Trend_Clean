@@ -33,12 +33,12 @@
   "saveChanges": "Lưu thay đổi",
   "usernameRequired": "Tên người dùng không được để trống.",
   "searchLabel": "Tìm kiếm",
-  "genreLabel": "Thể loại",
+  "genreLabel": "Theo năm",
   "discoverLabel": "Khám phá",
   "musicDiscoveryTitle": "Khám phá âm nhạc",
   "discoverSearchHint": "Tìm kiếm bài hát, nghệ sĩ hoặc album",
-  "genreScreenTitle": "Ký ức theo năm",
-  "genreScreenSubtitle": "Những bài hát bạn lưu sẽ được gom lại theo từng năm để dễ nghe lại và giữ cảm xúc gọn gàng hơn.",
+  "genreScreenTitle": "Nhạc ngắn theo năm",
+  "genreScreenSubtitle": "Những đoạn nhạc ngắn được gom theo từng năm để bạn nghe lại đúng vibe của từng giai đoạn.",
   "playlistsLabel": "Danh sách phát",
   "recentLabel": "Gần đây",
   "favoritesLabel": "Yêu thích",
@@ -205,6 +205,10 @@
   "actionSuccessMessage": "Thao tác thành công!",
   "deleteLabel": "Xoá",
   "newSongTitle": "Thêm bài hát mới",
+  "yearSongAdminTitle": "Admin Panel — Nhạc theo năm",
+  "addYearSongLabel": "Thêm theo năm",
+  "newYearSongTitle": "Thêm nhạc theo năm",
+  "editYearSongTitle": "Sửa nhạc theo năm",
   "editSongTitle": "Chỉnh sửa bài hát",
   "coverImageLabel": "Ảnh bìa",
   "chooseCoverImage": "Chọn ảnh bìa",
@@ -216,6 +220,9 @@
   "artistNameLabel": "Tên nghệ sĩ",
   "artistNameHint": "Ví dụ: Hoài Lâm",
   "artistNameRequiredMessage": "Vui lòng nhập tên nghệ sĩ",
+  "yearLabel": "Năm",
+  "selectYearHint": "Chọn năm",
+  "yearRequiredMessage": "Vui lòng chọn năm",
   "songTagsLabel": "Tag gợi ý",
   "songTagsHint": "Ví dụ: buồn, chill, thất tình, ballad",
   "songTagsHelperText": "Nhập các tag ngắn, cách nhau bằng dấu phẩy. Ưu tiên mood, vibe, genre hoặc ngữ cảnh nghe nhạc.",
@@ -228,6 +235,16 @@
   "savingSongChanges": "Đang lưu thay đổi...",
   "uploadAndSaveSong": "Upload & Lưu bài hát",
   "saveSongChanges": "Lưu thay đổi bài hát",
+  "yearSongEmptyTitle": "Chưa có bài nào theo năm",
+  "yearSongEmptySubtitle": "Nhấn nút thêm để đưa bài hát vào kho nhạc theo năm từ 2018 đến 2026.",
+  "deleteYearSongConfirmMessage": "Bạn có chắc muốn xoá bài theo năm \"{title}\" không?",
+  "@deleteYearSongConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "currentAudioWillBeKept": "Giữ file hiện tại: {fileName}",
   "@currentAudioWillBeKept": {
     "placeholders": {

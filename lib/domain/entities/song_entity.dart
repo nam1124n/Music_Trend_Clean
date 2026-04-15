@@ -8,6 +8,7 @@ class SongEntity {
   final List<String> semanticTags;
   final List<String> searchAliases;
   final int energyLevel;
+  final bool trackInWeeklyStats;
 
   const SongEntity({
     required this.id,
@@ -19,6 +20,7 @@ class SongEntity {
     this.semanticTags = const [],
     this.searchAliases = const [],
     this.energyLevel = 3,
+    this.trackInWeeklyStats = true,
   });
 
   factory SongEntity.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class SongEntity {
       semanticTags: _readStringList(json['semanticTags']),
       searchAliases: _readStringList(json['searchAliases']),
       energyLevel: _readEnergyLevel(json['energyLevel']),
+      trackInWeeklyStats: _readTrackInWeeklyStats(json['trackInWeeklyStats']),
     );
   }
 
@@ -46,6 +49,16 @@ class SongEntity {
       'semanticTags': semanticTags,
       'searchAliases': searchAliases,
       'energyLevel': energyLevel,
+      'trackInWeeklyStats': trackInWeeklyStats,
+    };
+  }
+
+  static bool _readTrackInWeeklyStats(Object? value) {
+    return switch (value) {
+      bool v => v,
+      String v => v.toLowerCase() != 'false',
+      num v => v != 0,
+      _ => true,
     };
   }
 

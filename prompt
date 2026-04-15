@@ -1,0 +1,11 @@
+1 prompt setup rule
+bạn là senior flutter  developer
+quy tắc dự án : 
+đây là app flutter 
+dùng clean architeture
+state management: riverpod
+ưu tiên dùng widget và thêm có sẵn
+code đơn giản, dễ đọc 
+không tạo  file thừa 
+dữ đúng cấu trúc hiện tại 
+sau mỗi thay đôi chạy dart format, đảm bảo flutter analyze không lỗi

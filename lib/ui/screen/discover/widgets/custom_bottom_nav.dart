@@ -36,8 +36,8 @@ class CustomBottomNav extends StatelessWidget {
             ),
             _buildNavItem(
               index: 1,
-              icon: Icons.category_outlined,
-              activeIcon: Icons.category_rounded,
+              icon: Icons.calendar_month_outlined,
+              activeIcon: Icons.calendar_month,
               label: l10n.genreLabel,
             ),
             const SizedBox(width: 60),

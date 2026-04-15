@@ -33,12 +33,12 @@
   "saveChanges": "Save Changes",
   "usernameRequired": "Username cannot be empty.",
   "searchLabel": "Search",
-  "genreLabel": "Genres",
+  "genreLabel": "By Year",
   "discoverLabel": "Discover",
   "musicDiscoveryTitle": "Discover Music",
   "discoverSearchHint": "Search songs, artists or albums",
-  "genreScreenTitle": "Memories by Year",
-  "genreScreenSubtitle": "Songs you save are grouped by year so they are easier to revisit without visual clutter.",
+  "genreScreenTitle": "Short Tracks by Year",
+  "genreScreenSubtitle": "Short tracks are grouped by year so you can revisit the vibe of each period.",
   "playlistsLabel": "Playlists",
   "recentLabel": "Recent",
   "favoritesLabel": "Favorites",
@@ -205,6 +205,10 @@
   "actionSuccessMessage": "Action completed successfully!",
   "deleteLabel": "Delete",
   "newSongTitle": "Add New Song",
+  "yearSongAdminTitle": "Admin Panel — By Year Music",
+  "addYearSongLabel": "Add by Year",
+  "newYearSongTitle": "Add By-Year Song",
+  "editYearSongTitle": "Edit By-Year Song",
   "editSongTitle": "Edit Song",
   "coverImageLabel": "Cover Image",
   "chooseCoverImage": "Choose cover image",
@@ -216,6 +220,9 @@
   "artistNameLabel": "Artist Name",
   "artistNameHint": "Example: Hoai Lam",
   "artistNameRequiredMessage": "Please enter the artist name",
+  "yearLabel": "Year",
+  "selectYearHint": "Select year",
+  "yearRequiredMessage": "Please select a year",
   "songTagsLabel": "Recommendation Tags",
   "songTagsHint": "Example: sad, chill, heartbreak, ballad",
   "songTagsHelperText": "Enter short tags separated by commas. Focus on mood, vibe, genre, or listening context.",
@@ -228,6 +235,16 @@
   "savingSongChanges": "Saving changes...",
   "uploadAndSaveSong": "Upload & Save Song",
   "saveSongChanges": "Save Song Changes",
+  "yearSongEmptyTitle": "No by-year songs yet",
+  "yearSongEmptySubtitle": "Tap add to place songs into the by-year archive from 2018 to 2026.",
+  "deleteYearSongConfirmMessage": "Are you sure you want to delete the by-year song \"{title}\"?",
+  "@deleteYearSongConfirmMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "currentAudioWillBeKept": "Keeping current file: {fileName}",
   "@currentAudioWillBeKept": {
     "placeholders": {

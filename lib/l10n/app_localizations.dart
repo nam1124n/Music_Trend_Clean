@@ -257,7 +257,7 @@ abstract class AppLocalizations {
   /// No description provided for @genreLabel.
   ///
   /// In en, this message translates to:
-  /// **'Genres'**
+  /// **'By Year'**
   String get genreLabel;
 
   /// No description provided for @discoverLabel.
@@ -281,13 +281,13 @@ abstract class AppLocalizations {
   /// No description provided for @genreScreenTitle.
   ///
   /// In en, this message translates to:
-  /// **'Memories by Year'**
+  /// **'Short Tracks by Year'**
   String get genreScreenTitle;
 
   /// No description provided for @genreScreenSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Songs you save are grouped by year so they are easier to revisit without visual clutter.'**
+  /// **'Short tracks are grouped by year so you can revisit the vibe of each period.'**
   String get genreScreenSubtitle;
 
   /// No description provided for @playlistsLabel.
@@ -788,6 +788,30 @@ abstract class AppLocalizations {
   /// **'Add New Song'**
   String get newSongTitle;
 
+  /// No description provided for @yearSongAdminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin Panel — By Year Music'**
+  String get yearSongAdminTitle;
+
+  /// No description provided for @addYearSongLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Add by Year'**
+  String get addYearSongLabel;
+
+  /// No description provided for @newYearSongTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add By-Year Song'**
+  String get newYearSongTitle;
+
+  /// No description provided for @editYearSongTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit By-Year Song'**
+  String get editYearSongTitle;
+
   /// No description provided for @editSongTitle.
   ///
   /// In en, this message translates to:
@@ -853,6 +877,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter the artist name'**
   String get artistNameRequiredMessage;
+
+  /// No description provided for @yearLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Year'**
+  String get yearLabel;
+
+  /// No description provided for @selectYearHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select year'**
+  String get selectYearHint;
+
+  /// No description provided for @yearRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a year'**
+  String get yearRequiredMessage;
 
   /// No description provided for @songTagsLabel.
   ///
@@ -925,6 +967,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save Song Changes'**
   String get saveSongChanges;
+
+  /// No description provided for @yearSongEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No by-year songs yet'**
+  String get yearSongEmptyTitle;
+
+  /// No description provided for @yearSongEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap add to place songs into the by-year archive from 2018 to 2026.'**
+  String get yearSongEmptySubtitle;
+
+  /// No description provided for @deleteYearSongConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete the by-year song \"{title}\"?'**
+  String deleteYearSongConfirmMessage(String title);
 
   /// No description provided for @currentAudioWillBeKept.
   ///

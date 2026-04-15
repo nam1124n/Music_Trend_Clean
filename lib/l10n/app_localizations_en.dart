@@ -89,7 +89,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchLabel => 'Search';
 
   @override
-  String get genreLabel => 'Genres';
+  String get genreLabel => 'By Year';
 
   @override
   String get discoverLabel => 'Discover';
@@ -101,11 +101,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get discoverSearchHint => 'Search songs, artists or albums';
 
   @override
-  String get genreScreenTitle => 'Memories by Year';
+  String get genreScreenTitle => 'Short Tracks by Year';
 
   @override
   String get genreScreenSubtitle =>
-      'Songs you save are grouped by year so they are easier to revisit without visual clutter.';
+      'Short tracks are grouped by year so you can revisit the vibe of each period.';
 
   @override
   String get playlistsLabel => 'Playlists';
@@ -392,6 +392,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newSongTitle => 'Add New Song';
 
   @override
+  String get yearSongAdminTitle => 'Admin Panel — By Year Music';
+
+  @override
+  String get addYearSongLabel => 'Add by Year';
+
+  @override
+  String get newYearSongTitle => 'Add By-Year Song';
+
+  @override
+  String get editYearSongTitle => 'Edit By-Year Song';
+
+  @override
   String get editSongTitle => 'Edit Song';
 
   @override
@@ -423,6 +435,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get artistNameRequiredMessage => 'Please enter the artist name';
+
+  @override
+  String get yearLabel => 'Year';
+
+  @override
+  String get selectYearHint => 'Select year';
+
+  @override
+  String get yearRequiredMessage => 'Please select a year';
 
   @override
   String get songTagsLabel => 'Recommendation Tags';
@@ -462,6 +483,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveSongChanges => 'Save Song Changes';
+
+  @override
+  String get yearSongEmptyTitle => 'No by-year songs yet';
+
+  @override
+  String get yearSongEmptySubtitle =>
+      'Tap add to place songs into the by-year archive from 2018 to 2026.';
+
+  @override
+  String deleteYearSongConfirmMessage(String title) {
+    return 'Are you sure you want to delete the by-year song \"$title\"?';
+  }
 
   @override
   String currentAudioWillBeKept(String fileName) {

@@ -90,7 +90,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get searchLabel => 'Tìm kiếm';
 
   @override
-  String get genreLabel => 'Thể loại';
+  String get genreLabel => 'Theo năm';
 
   @override
   String get discoverLabel => 'Khám phá';
@@ -102,11 +102,11 @@ class AppLocalizationsVi extends AppLocalizations {
   String get discoverSearchHint => 'Tìm kiếm bài hát, nghệ sĩ hoặc album';
 
   @override
-  String get genreScreenTitle => 'Ký ức theo năm';
+  String get genreScreenTitle => 'Nhạc ngắn theo năm';
 
   @override
   String get genreScreenSubtitle =>
-      'Những bài hát bạn lưu sẽ được gom lại theo từng năm để dễ nghe lại và giữ cảm xúc gọn gàng hơn.';
+      'Những đoạn nhạc ngắn được gom theo từng năm để bạn nghe lại đúng vibe của từng giai đoạn.';
 
   @override
   String get playlistsLabel => 'Danh sách phát';
@@ -390,6 +390,18 @@ class AppLocalizationsVi extends AppLocalizations {
   String get newSongTitle => 'Thêm bài hát mới';
 
   @override
+  String get yearSongAdminTitle => 'Admin Panel — Nhạc theo năm';
+
+  @override
+  String get addYearSongLabel => 'Thêm theo năm';
+
+  @override
+  String get newYearSongTitle => 'Thêm nhạc theo năm';
+
+  @override
+  String get editYearSongTitle => 'Sửa nhạc theo năm';
+
+  @override
   String get editSongTitle => 'Chỉnh sửa bài hát';
 
   @override
@@ -421,6 +433,15 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get artistNameRequiredMessage => 'Vui lòng nhập tên nghệ sĩ';
+
+  @override
+  String get yearLabel => 'Năm';
+
+  @override
+  String get selectYearHint => 'Chọn năm';
+
+  @override
+  String get yearRequiredMessage => 'Vui lòng chọn năm';
 
   @override
   String get songTagsLabel => 'Tag gợi ý';
@@ -461,6 +482,18 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get saveSongChanges => 'Lưu thay đổi bài hát';
+
+  @override
+  String get yearSongEmptyTitle => 'Chưa có bài nào theo năm';
+
+  @override
+  String get yearSongEmptySubtitle =>
+      'Nhấn nút thêm để đưa bài hát vào kho nhạc theo năm từ 2018 đến 2026.';
+
+  @override
+  String deleteYearSongConfirmMessage(String title) {
+    return 'Bạn có chắc muốn xoá bài theo năm \"$title\" không?';
+  }
 
   @override
   String currentAudioWillBeKept(String fileName) {
