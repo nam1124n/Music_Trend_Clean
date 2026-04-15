@@ -7,6 +7,11 @@ abstract class SongRepository {
   Stream<List<SongEntity>> getSongs();
   Stream<List<TrendingSongEntity>> getWeeklyTrendingSongs({int limit = 4});
   Future<void> addSong(SongEntity song, XFile imageFile, XFile audioFile);
+  Future<void> updateSong(
+    SongEntity song, {
+    XFile? imageFile,
+    XFile? audioFile,
+  });
   Future<void> deleteSong(String id);
   Future<void> trackSongListen(SongEntity song);
 }

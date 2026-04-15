@@ -68,7 +68,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get likedTabTitle => 'Đã thích';
 
   @override
-  String get likedTabDescription => 'Danh sách bài hát yêu thích sẽ hiển thị tại đây.';
+  String get likedTabDescription =>
+      'Danh sách bài hát yêu thích sẽ hiển thị tại đây.';
 
   @override
   String get editProfileTitle => 'Chỉnh sửa hồ sơ';
@@ -104,7 +105,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get genreScreenTitle => 'Ký ức theo năm';
 
   @override
-  String get genreScreenSubtitle => 'Những bài hát bạn lưu sẽ được gom lại theo từng năm để dễ nghe lại và giữ cảm xúc gọn gàng hơn.';
+  String get genreScreenSubtitle =>
+      'Những bài hát bạn lưu sẽ được gom lại theo từng năm để dễ nghe lại và giữ cảm xúc gọn gàng hơn.';
 
   @override
   String get playlistsLabel => 'Danh sách phát';
@@ -161,13 +163,15 @@ class AppLocalizationsVi extends AppLocalizations {
   String get importAudioFromVideo => 'Nhập âm thanh từ video';
 
   @override
-  String get importAudioFromVideoSubtitle => 'Tự động trích xuất âm thanh từ clip của bạn';
+  String get importAudioFromVideoSubtitle =>
+      'Tự động trích xuất âm thanh từ clip của bạn';
 
   @override
   String get importAudioFromDevice => 'Nhập âm thanh từ thiết bị';
 
   @override
-  String get importAudioFromDeviceSubtitle => 'Chọn âm thanh chất lượng cao từ máy của bạn';
+  String get importAudioFromDeviceSubtitle =>
+      'Chọn âm thanh chất lượng cao từ máy của bạn';
 
   @override
   String get importButtonLabel => '+ Nhập';
@@ -179,7 +183,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get yourAudioEmptyTitle => 'Chưa có âm thanh nào';
 
   @override
-  String get yourAudioEmptySubtitle => 'Nhập âm thanh yêu thích của bạn để bắt đầu sáng tạo. Mọi thứ bạn thêm sẽ xuất hiện tại đây.';
+  String get yourAudioEmptySubtitle =>
+      'Nhập âm thanh yêu thích của bạn để bắt đầu sáng tạo. Mọi thứ bạn thêm sẽ xuất hiện tại đây.';
 
   @override
   String get getStartedNow => 'Bắt đầu ngay';
@@ -203,7 +208,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get trendingEmptyTitle => 'Chưa có đủ lượt nghe để xếp hạng tuần này';
 
   @override
-  String get trendingEmptySubtitle => 'Top 4 sẽ tự cập nhật khi người dùng nghe đủ thời lượng.';
+  String get trendingEmptySubtitle =>
+      'Top 4 sẽ tự cập nhật khi người dùng nghe đủ thời lượng.';
 
   @override
   String listenersCount(String count) {
@@ -222,7 +228,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get noSongDataTitle => 'Chưa có dữ liệu bài hát';
 
   @override
-  String get noSongDataSubtitle => 'Thêm bài hát trong Firestore hoặc từ trang admin để giao diện này hiển thị dữ liệu thật.';
+  String get noSongDataSubtitle =>
+      'Thêm bài hát trong Firestore hoặc từ trang admin để giao diện này hiển thị dữ liệu thật.';
 
   @override
   String get searchHint => 'Tìm bài hát, ca sĩ, mood, trend...';
@@ -289,10 +296,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get promptLabel => 'Prompt mô tả';
 
   @override
-  String get promptHint => 'Ví dụ: Tạo một đoạn nhạc chill lofi, piano nhẹ, mưa đêm thành phố, cảm giác thư giãn.';
+  String get promptHint =>
+      'Ví dụ: Tạo một đoạn nhạc chill lofi, piano nhẹ, mưa đêm thành phố, cảm giác thư giãn.';
 
   @override
-  String get promptHelpText => 'Prompt càng rõ về mood, nhạc cụ, tempo thì kết quả mock càng dễ thay bằng API thật sau này.';
+  String get promptHelpText =>
+      'Prompt càng rõ về mood, nhạc cụ, tempo thì kết quả mock càng dễ thay bằng API thật sau này.';
 
   @override
   String get durationLabel => 'Thời lượng';
@@ -331,10 +340,12 @@ class AppLocalizationsVi extends AppLocalizations {
   String get promptRequiredMessage => 'Vui lòng nhập prompt để tạo audio.';
 
   @override
-  String get promptTooShortMessage => 'Prompt nên có ít nhất 10 ký tự để AI hiểu tốt hơn.';
+  String get promptTooShortMessage =>
+      'Prompt nên có ít nhất 10 ký tự để AI hiểu tốt hơn.';
 
   @override
-  String get audioDurationRangeMessage => 'Thời lượng audio phải từ 5 đến 60 giây.';
+  String get audioDurationRangeMessage =>
+      'Thời lượng audio phải từ 5 đến 60 giây.';
 
   @override
   String get adminPanelTitle => 'Admin Panel — Quản lý bài hát';
@@ -346,7 +357,8 @@ class AppLocalizationsVi extends AppLocalizations {
   String get accessDeniedTitle => 'Truy cập bị từ chối';
 
   @override
-  String get accessDeniedMessage => 'Bạn không có quyền truy cập vào trang này.';
+  String get accessDeniedMessage =>
+      'Bạn không có quyền truy cập vào trang này.';
 
   @override
   String get goBack => 'Quay lại';
@@ -376,6 +388,9 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get newSongTitle => 'Thêm bài hát mới';
+
+  @override
+  String get editSongTitle => 'Chỉnh sửa bài hát';
 
   @override
   String get coverImageLabel => 'Ảnh bìa';
@@ -414,28 +429,43 @@ class AppLocalizationsVi extends AppLocalizations {
   String get songTagsHint => 'Ví dụ: buồn, chill, thất tình, ballad';
 
   @override
-  String get songTagsHelperText => 'Nhập các tag ngắn, cách nhau bằng dấu phẩy. Ưu tiên mood, vibe, genre hoặc ngữ cảnh nghe nhạc.';
+  String get songTagsHelperText =>
+      'Nhập các tag ngắn, cách nhau bằng dấu phẩy. Ưu tiên mood, vibe, genre hoặc ngữ cảnh nghe nhạc.';
 
   @override
   String get searchAliasesLabel => 'Tên gọi dễ tìm';
 
   @override
-  String get searchAliasesHint => 'Ví dụ: nhạc tiktok buồn, đoạn điệp khúc viral';
+  String get searchAliasesHint =>
+      'Ví dụ: nhạc tiktok buồn, đoạn điệp khúc viral';
 
   @override
-  String get searchAliasesHelperText => 'Dùng cho cách người dùng hay nhớ bài theo trend, câu hook hoặc tên gọi không chính thức.';
+  String get searchAliasesHelperText =>
+      'Dùng cho cách người dùng hay nhớ bài theo trend, câu hook hoặc tên gọi không chính thức.';
 
   @override
   String get energyLevelLabel => 'Mức năng lượng';
 
   @override
-  String get energyLevelHelperText => '1 là rất nhẹ/chill, 5 là mạnh/sôi động. Dữ liệu cũ sẽ mặc định ở mức 3.';
+  String get energyLevelHelperText =>
+      '1 là rất nhẹ/chill, 5 là mạnh/sôi động. Dữ liệu cũ sẽ mặc định ở mức 3.';
 
   @override
   String get uploadingSong => 'Đang upload lên Cloudinary...';
 
   @override
+  String get savingSongChanges => 'Đang lưu thay đổi...';
+
+  @override
   String get uploadAndSaveSong => 'Upload & Lưu bài hát';
+
+  @override
+  String get saveSongChanges => 'Lưu thay đổi bài hát';
+
+  @override
+  String currentAudioWillBeKept(String fileName) {
+    return 'Giữ file hiện tại: $fileName';
+  }
 
   @override
   String get coverImageRequiredMessage => 'Vui lòng chọn ảnh bìa!';

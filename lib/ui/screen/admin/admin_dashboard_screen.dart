@@ -160,10 +160,30 @@ class AdminDashboardScreen extends ConsumerWidget {
                 song.artist,
                 style: TextStyle(color: Colors.grey[600], fontSize: 13),
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () =>
-                    _confirmDelete(context, ref, song.id, song.title),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      color: Color(0xFF8C52FF),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              AdminSongFormScreen(initialSong: song),
+                        ),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () =>
+                        _confirmDelete(context, ref, song.id, song.title),
+                  ),
+                ],
               ),
             ),
           );

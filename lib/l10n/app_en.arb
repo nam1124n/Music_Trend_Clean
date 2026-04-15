@@ -205,6 +205,7 @@
   "actionSuccessMessage": "Action completed successfully!",
   "deleteLabel": "Delete",
   "newSongTitle": "Add New Song",
+  "editSongTitle": "Edit Song",
   "coverImageLabel": "Cover Image",
   "chooseCoverImage": "Choose cover image",
   "audioFilePickerLabel": "Audio File (mp3, m4a...)",
@@ -224,7 +225,17 @@
   "energyLevelLabel": "Energy Level",
   "energyLevelHelperText": "1 is very soft/chill, 5 is intense/high-energy. Old records default to level 3.",
   "uploadingSong": "Uploading to Cloudinary...",
+  "savingSongChanges": "Saving changes...",
   "uploadAndSaveSong": "Upload & Save Song",
+  "saveSongChanges": "Save Song Changes",
+  "currentAudioWillBeKept": "Keeping current file: {fileName}",
+  "@currentAudioWillBeKept": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
   "coverImageRequiredMessage": "Please choose a cover image!",
   "audioFileRequiredMessage": "Please choose an audio file!"
 }

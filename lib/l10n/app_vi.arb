@@ -205,6 +205,7 @@
   "actionSuccessMessage": "Thao tác thành công!",
   "deleteLabel": "Xoá",
   "newSongTitle": "Thêm bài hát mới",
+  "editSongTitle": "Chỉnh sửa bài hát",
   "coverImageLabel": "Ảnh bìa",
   "chooseCoverImage": "Chọn ảnh bìa",
   "audioFilePickerLabel": "File Audio (mp3, m4a...)",
@@ -224,7 +225,17 @@
   "energyLevelLabel": "Mức năng lượng",
   "energyLevelHelperText": "1 là rất nhẹ/chill, 5 là mạnh/sôi động. Dữ liệu cũ sẽ mặc định ở mức 3.",
   "uploadingSong": "Đang upload lên Cloudinary...",
+  "savingSongChanges": "Đang lưu thay đổi...",
   "uploadAndSaveSong": "Upload & Lưu bài hát",
+  "saveSongChanges": "Lưu thay đổi bài hát",
+  "currentAudioWillBeKept": "Giữ file hiện tại: {fileName}",
+  "@currentAudioWillBeKept": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
   "coverImageRequiredMessage": "Vui lòng chọn ảnh bìa!",
   "audioFileRequiredMessage": "Vui lòng chọn file audio!"
 }

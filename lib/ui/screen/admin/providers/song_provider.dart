@@ -10,6 +10,7 @@ import 'package:login_flutter/domain/usecases/delete_song_usecase.dart';
 import 'package:login_flutter/domain/usecases/get_songs_usecase.dart';
 import 'package:login_flutter/domain/usecases/get_weekly_trending_songs_usecase.dart';
 import 'package:login_flutter/domain/usecases/track_song_listen_usecase.dart';
+import 'package:login_flutter/domain/usecases/update_song_usecase.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:login_flutter/ui/screen/admin/providers/song_state.dart';
 
@@ -27,6 +28,10 @@ final getSongsUseCaseProvider = Provider<GetSongsUseCase>((ref) {
 
 final addSongUseCaseProvider = Provider<AddSongUseCase>((ref) {
   return AddSongUseCase(ref.read(songRepositoryProvider));
+});
+
+final updateSongUseCaseProvider = Provider<UpdateSongUseCase>((ref) {
+  return UpdateSongUseCase(ref.read(songRepositoryProvider));
 });
 
 final deleteSongUseCaseProvider = Provider<DeleteSongUseCase>((ref) {
@@ -48,6 +53,7 @@ final songNotifierProvider = StateNotifierProvider<SongNotifier, SongState>((
   return SongNotifier(
     getSongsUseCase: ref.read(getSongsUseCaseProvider),
     addSongUseCase: ref.read(addSongUseCaseProvider),
+    updateSongUseCase: ref.read(updateSongUseCaseProvider),
     deleteSongUseCase: ref.read(deleteSongUseCaseProvider),
   );
 });
@@ -55,12 +61,14 @@ final songNotifierProvider = StateNotifierProvider<SongNotifier, SongState>((
 class SongNotifier extends StateNotifier<SongState> {
   final GetSongsUseCase getSongsUseCase;
   final AddSongUseCase addSongUseCase;
+  final UpdateSongUseCase updateSongUseCase;
   final DeleteSongUseCase deleteSongUseCase;
   StreamSubscription<List<SongEntity>>? _songsSubscription;
 
   SongNotifier({
     required this.getSongsUseCase,
     required this.addSongUseCase,
+    required this.updateSongUseCase,
     required this.deleteSongUseCase,
   }) : super(SongInitial()) {
     loadSongs();
@@ -86,6 +94,21 @@ class SongNotifier extends StateNotifier<SongState> {
 
     try {
       await addSongUseCase(song, imageFile, audioFile);
+      state = SongActionSuccess();
+    } catch (e) {
+      state = SongError(e.toString());
+    }
+  }
+
+  Future<void> updateSong(
+    SongEntity song, {
+    XFile? imageFile,
+    XFile? audioFile,
+  }) async {
+    state = SongLoading();
+
+    try {
+      await updateSongUseCase(song, imageFile: imageFile, audioFile: audioFile);
       state = SongActionSuccess();
     } catch (e) {
       state = SongError(e.toString());

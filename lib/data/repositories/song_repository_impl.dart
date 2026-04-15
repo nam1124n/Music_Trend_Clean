@@ -70,6 +70,31 @@ class SongRepositoryImpl implements SongRepository {
   }
 
   @override
+  Future<void> updateSong(
+    SongEntity song, {
+    XFile? imageFile,
+    XFile? audioFile,
+  }) async {
+    var imageUrl = song.imageUrl;
+    var audioUrl = song.audioUrl;
+
+    if (imageFile != null) {
+      imageUrl = await remoteDataSource.uploadImage(imageFile);
+    }
+
+    if (audioFile != null) {
+      audioUrl = await remoteDataSource.uploadAudio(audioFile);
+    }
+
+    final model = SongModel.fromEntity(song);
+    await remoteDataSource.updateSong(song.id, {
+      ...model.toMap(),
+      'imageUrl': imageUrl,
+      'audioUrl': audioUrl,
+    });
+  }
+
+  @override
   Future<void> deleteSong(String id) async {
     await remoteDataSource.deleteSong(id);
   }

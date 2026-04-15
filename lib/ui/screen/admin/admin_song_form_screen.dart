@@ -11,7 +11,9 @@ import 'package:login_flutter/ui/screen/admin/providers/song_state.dart';
 import 'package:login_flutter/ui/screen/admin/widgets/label_text.dart';
 
 class AdminSongFormScreen extends ConsumerStatefulWidget {
-  const AdminSongFormScreen({super.key});
+  final SongEntity? initialSong;
+
+  const AdminSongFormScreen({super.key, this.initialSong});
 
   @override
   ConsumerState<AdminSongFormScreen> createState() =>
@@ -30,6 +32,26 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
   XFile? _pickedAudio;
   final _picker = ImagePicker();
   int _energyLevel = 3;
+
+  bool get _isEditing => widget.initialSong != null;
+  bool get _hasExistingImage => (widget.initialSong?.imageUrl ?? '').isNotEmpty;
+  bool get _hasExistingAudio => (widget.initialSong?.audioUrl ?? '').isNotEmpty;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final initialSong = widget.initialSong;
+    if (initialSong == null) {
+      return;
+    }
+
+    _titleController.text = initialSong.title;
+    _artistController.text = initialSong.artist;
+    _tagsController.text = initialSong.semanticTags.join(', ');
+    _aliasesController.text = initialSong.searchAliases.join(', ');
+    _energyLevel = initialSong.energyLevel;
+  }
 
   @override
   void dispose() {
@@ -63,7 +85,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
     final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
 
-    if (_pickedImage == null) {
+    if (!_isEditing && _pickedImage == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.coverImageRequiredMessage),
@@ -73,7 +95,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
       return;
     }
 
-    if (_pickedAudio == null) {
+    if (!_isEditing && _pickedAudio == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.audioFileRequiredMessage),
@@ -84,19 +106,25 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
     }
 
     final song = SongEntity(
-      id: '',
+      id: widget.initialSong?.id ?? '',
       title: _titleController.text.trim(),
       artist: _artistController.text.trim(),
-      audioUrl: '',
-      imageUrl: '',
+      audioUrl: widget.initialSong?.audioUrl ?? '',
+      imageUrl: widget.initialSong?.imageUrl ?? '',
       semanticTags: _parseMultiValueField(_tagsController.text),
       searchAliases: _parseMultiValueField(_aliasesController.text),
       energyLevel: _energyLevel,
     );
 
-    await ref
-        .read(songNotifierProvider.notifier)
-        .addSong(song, _pickedImage!, _pickedAudio!);
+    if (_isEditing) {
+      await ref
+          .read(songNotifierProvider.notifier)
+          .updateSong(song, imageFile: _pickedImage, audioFile: _pickedAudio);
+    } else {
+      await ref
+          .read(songNotifierProvider.notifier)
+          .addSong(song, _pickedImage!, _pickedAudio!);
+    }
 
     if (!mounted) {
       return;
@@ -133,7 +161,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
         title: Text(
-          l10n.newSongTitle,
+          _isEditing ? l10n.editSongTitle : l10n.newSongTitle,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -160,7 +188,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: _pickedImage != null
+                      color: _pickedImage != null || _hasExistingImage
                           ? const Color(0xFF8C52FF)
                           : Colors.grey.shade300,
                       width: 2,
@@ -173,6 +201,17 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                             _pickedImageBytes!,
                             fit: BoxFit.cover,
                             width: double.infinity,
+                          ),
+                        )
+                      : _hasExistingImage
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Image.network(
+                            widget.initialSong!.imageUrl,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            errorBuilder: (_, _, _) =>
+                                _buildImagePlaceholder(l10n),
                           ),
                         )
                       : Column(
@@ -206,7 +245,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: _pickedAudio != null
+                      color: _pickedAudio != null || _hasExistingAudio
                           ? const Color(0xFF8C52FF)
                           : Colors.grey.shade300,
                       width: 2,
@@ -218,7 +257,7 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                         _pickedAudio != null
                             ? Icons.audio_file
                             : Icons.upload_file,
-                        color: _pickedAudio != null
+                        color: _pickedAudio != null || _hasExistingAudio
                             ? const Color(0xFF8C52FF)
                             : Colors.grey[400],
                         size: 32,
@@ -226,11 +265,9 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: Text(
-                          _pickedAudio != null
-                              ? _pickedAudio!.name
-                              : l10n.selectAudioFile,
+                          _audioDisplayLabel(l10n),
                           style: TextStyle(
-                            color: _pickedAudio != null
+                            color: _pickedAudio != null || _hasExistingAudio
                                 ? Colors.black87
                                 : Colors.grey[500],
                           ),
@@ -359,11 +396,17 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
                               ),
                             ),
                             const SizedBox(width: 12),
-                            Text(l10n.uploadingSong),
+                            Text(
+                              _isEditing
+                                  ? l10n.savingSongChanges
+                                  : l10n.uploadingSong,
+                            ),
                           ],
                         )
                       : Text(
-                          l10n.uploadAndSaveSong,
+                          _isEditing
+                              ? l10n.saveSongChanges
+                              : l10n.uploadAndSaveSong,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -401,6 +444,43 @@ class _AdminSongFormScreenState extends ConsumerState<AdminSongFormScreen> {
       borderSide: const BorderSide(color: Colors.red),
     ),
   );
+
+  Widget _buildImagePlaceholder(AppLocalizations l10n) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.add_photo_alternate_outlined,
+          size: 48,
+          color: Colors.grey[400],
+        ),
+        const SizedBox(height: 8),
+        Text(l10n.chooseCoverImage, style: TextStyle(color: Colors.grey[500])),
+      ],
+    );
+  }
+
+  String _audioDisplayLabel(AppLocalizations l10n) {
+    if (_pickedAudio != null) {
+      return _pickedAudio!.name;
+    }
+
+    final audioUrl = widget.initialSong?.audioUrl ?? '';
+    if (audioUrl.isNotEmpty) {
+      return l10n.currentAudioWillBeKept(_extractFileName(audioUrl));
+    }
+
+    return l10n.selectAudioFile;
+  }
+
+  String _extractFileName(String url) {
+    final uri = Uri.tryParse(url);
+    final lastSegment = uri?.pathSegments.isNotEmpty == true
+        ? uri!.pathSegments.last
+        : url;
+
+    return Uri.decodeComponent(lastSegment);
+  }
 
   List<String> _parseMultiValueField(String raw) {
     final values = raw
