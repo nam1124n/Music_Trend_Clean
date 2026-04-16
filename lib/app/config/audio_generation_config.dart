@@ -4,13 +4,11 @@ class AudioGenerationConfig {
     defaultValue: 'mock://audio-generator',
   );
 
-  static const String generatePath = String.fromEnvironment(
-    'AUDIO_GENERATION_GENERATE_PATH',
-    defaultValue: '/v1/audio/generate',
-  );
+  static const String generatePath = '/api/generate';
+  static const String generationsPath = '/api/generations';
+  static const String mySongsPath = '/api/my-songs';
 
-  static const int timeoutSeconds = int.fromEnvironment(
-    'AUDIO_GENERATION_TIMEOUT_SECONDS',
-    defaultValue: 45,
-  );
+  static const int timeoutSeconds = 45;
+  static const int pollIntervalSeconds = 2;
+  static const int maxPollAttempts = 15;
 }

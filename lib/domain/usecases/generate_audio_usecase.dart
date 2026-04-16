@@ -7,10 +7,12 @@ class GenerateAudioUseCase {
   GenerateAudioUseCase(this.repository);
 
   Future<GeneratedAudioEntity> call({
+    required String userId,
     required String prompt,
     required int durationSeconds,
   }) {
     return repository.generateAudio(
+      userId: userId,
       prompt: prompt,
       durationSeconds: durationSeconds,
     );

@@ -1,27 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:login_flutter/data/datasource/remote/audio_generation_remote_data_source.dart';
-import 'package:login_flutter/data/repositories/audio_generation_repository_impl.dart';
-import 'package:login_flutter/domain/repositories/audio_generation_repository.dart';
+import 'package:login_flutter/app/providers/audio_generation_provider.dart';
 import 'package:login_flutter/domain/usecases/generate_audio_usecase.dart';
+import 'package:login_flutter/ui/screen/auth/providers/auth_provider.dart';
+import 'package:login_flutter/ui/screen/auth/providers/auth_state.dart';
 import 'package:login_flutter/ui/screen/create_audio/providers/create_audio_state.dart';
 import 'package:login_flutter/ui/screen/my_audios/providers/my_audios_provider.dart';
-
-final audioGenerationRemoteDataSourceProvider =
-    Provider<AudioGenerationRemoteDataSource>((ref) {
-      return AudioGenerationRemoteDataSource();
-    });
-
-final audioGenerationRepositoryProvider = Provider<AudioGenerationRepository>((
-  ref,
-) {
-  return AudioGenerationRepositoryImpl(
-    ref.read(audioGenerationRemoteDataSourceProvider),
-  );
-});
-
-final generateAudioUseCaseProvider = Provider<GenerateAudioUseCase>((ref) {
-  return GenerateAudioUseCase(ref.read(audioGenerationRepositoryProvider));
-});
 
 final createAudioNotifierProvider =
     StateNotifierProvider.autoDispose<CreateAudioNotifier, CreateAudioState>((
@@ -97,7 +80,13 @@ class CreateAudioNotifier extends StateNotifier<CreateAudioState> {
     );
 
     try {
+      final authState = ref.read(authNotifierProvider);
+      final userId = authState is AuthSuccess
+          ? authState.user.id
+          : 'guest_user';
+
       final generatedAudio = await generateAudioUseCase(
+        userId: userId,
         prompt: prompt,
         durationSeconds: state.durationSeconds,
       );

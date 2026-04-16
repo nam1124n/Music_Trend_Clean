@@ -14,7 +14,7 @@ class GeneratedAudioModel extends GeneratedAudioEntity {
   factory GeneratedAudioModel.fromJson(Map<String, dynamic> json) {
     return GeneratedAudioModel(
       id: json['id']?.toString() ?? '',
-      title: json['title']?.toString() ?? '',
+      title: json['title']?.toString() ?? 'AI Audio',
       prompt: json['prompt']?.toString() ?? '',
       audioUrl:
           json['audioUrl']?.toString() ?? json['audio_url']?.toString() ?? '',
@@ -23,8 +23,9 @@ class GeneratedAudioModel extends GeneratedAudioEntity {
       durationSeconds:
           (json['durationSeconds'] as num?)?.toInt() ??
           (json['duration_seconds'] as num?)?.toInt() ??
+          (json['duration_sec'] as num?)?.toInt() ??
           0,
-      provider: json['provider']?.toString() ?? 'unknown',
+      provider: json['provider']?.toString() ?? 'phoenix-backend',
     );
   }
 

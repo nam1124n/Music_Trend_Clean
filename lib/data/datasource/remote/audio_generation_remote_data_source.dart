@@ -9,48 +9,88 @@ class AudioGenerationRemoteDataSource {
   static const String _mockSampleAudioUrl =
       'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
 
-  Future<GeneratedAudioModel> generateAudio({
+  Future<String> createGeneration({
     required String baseUrl,
+    required String userId,
     required String prompt,
     required int durationSeconds,
   }) async {
-    if (baseUrl.startsWith('mock://')) {
-      return _generateMockAudio(
-        prompt: prompt,
-        durationSeconds: durationSeconds,
-      );
-    }
-
-    final normalizedBaseUrl = baseUrl.replaceFirst(RegExp(r'/+$'), '');
     final response = await http
         .post(
-          Uri.parse('$normalizedBaseUrl${AudioGenerationConfig.generatePath}'),
+          Uri.parse(
+            '${_normalizeBaseUrl(baseUrl)}${AudioGenerationConfig.generatePath}',
+          ),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
+            'user_id': userId,
             'prompt': prompt,
-            'duration_seconds': durationSeconds,
-            'format': 'mp3',
+            'duration_sec': durationSeconds,
           }),
         )
         .timeout(Duration(seconds: AudioGenerationConfig.timeoutSeconds));
 
-    if (response.statusCode >= 400) {
-      throw Exception(
-        'Không thể tạo audio (${response.statusCode}): ${response.body}',
-      );
+    _throwIfRequestFailed(
+      response,
+      defaultMessage: 'Không thể tạo generation audio',
+    );
+
+    final body = _decodeBodyAsMap(response.body);
+    final generationId = body['id']?.toString() ?? '';
+
+    if (generationId.isEmpty) {
+      throw Exception('Backend không trả về generation id hợp lệ.');
     }
 
-    final decoded = jsonDecode(response.body);
-    final payload = decoded is Map<String, dynamic>
-        ? (decoded['data'] is Map<String, dynamic>
-              ? decoded['data'] as Map<String, dynamic>
-              : decoded)
-        : <String, dynamic>{};
-
-    return GeneratedAudioModel.fromJson(payload);
+    return generationId;
   }
 
-  Future<GeneratedAudioModel> _generateMockAudio({
+  Future<Map<String, dynamic>> getGeneration({
+    required String baseUrl,
+    required String generationId,
+  }) async {
+    final response = await http
+        .get(
+          Uri.parse(
+            '${_normalizeBaseUrl(baseUrl)}${AudioGenerationConfig.generationsPath}/$generationId',
+          ),
+        )
+        .timeout(Duration(seconds: AudioGenerationConfig.timeoutSeconds));
+
+    _throwIfRequestFailed(
+      response,
+      defaultMessage: 'Không thể lấy thông tin generation',
+    );
+
+    return _decodeBodyAsMap(response.body);
+  }
+
+  Future<List<GeneratedAudioModel>> getMySongs({
+    required String baseUrl,
+    required String userId,
+  }) async {
+    final uri = Uri.parse(
+      '${_normalizeBaseUrl(baseUrl)}${AudioGenerationConfig.mySongsPath}',
+    ).replace(queryParameters: {'user_id': userId});
+
+    final response = await http
+        .get(uri)
+        .timeout(Duration(seconds: AudioGenerationConfig.timeoutSeconds));
+
+    _throwIfRequestFailed(
+      response,
+      defaultMessage: 'Không thể tải danh sách audio của user',
+    );
+
+    final body = _decodeBodyAsMap(response.body);
+    final songs = (body['songs'] as List<dynamic>? ?? []);
+
+    return songs
+        .whereType<Map<String, dynamic>>()
+        .map(GeneratedAudioModel.fromJson)
+        .toList();
+  }
+
+  Future<GeneratedAudioModel> generateMockAudio({
     required String prompt,
     required int durationSeconds,
   }) async {
@@ -89,5 +129,46 @@ class AudioGenerationRemoteDataSource {
     }
 
     return '${value[0].toUpperCase()}${value.substring(1)}';
+  }
+
+  String _normalizeBaseUrl(String baseUrl) {
+    return baseUrl.replaceFirst(RegExp(r'/+$'), '');
+  }
+
+  Map<String, dynamic> _decodeBodyAsMap(String body) {
+    final decoded = jsonDecode(body);
+
+    if (decoded is Map<String, dynamic>) {
+      return decoded;
+    }
+
+    throw Exception('Backend trả về dữ liệu không đúng định dạng JSON object.');
+  }
+
+  void _throwIfRequestFailed(
+    http.Response response, {
+    required String defaultMessage,
+  }) {
+    if (response.statusCode < 400) {
+      return;
+    }
+
+    final message =
+        _tryReadErrorMessage(response.body) ??
+        '$defaultMessage (${response.statusCode})';
+
+    throw Exception(message);
+  }
+
+  String? _tryReadErrorMessage(String body) {
+    try {
+      final decoded = jsonDecode(body);
+
+      if (decoded is Map<String, dynamic>) {
+        return decoded['error']?.toString();
+      }
+    } catch (_) {}
+
+    return null;
   }
 }
