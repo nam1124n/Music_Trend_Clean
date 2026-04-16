@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:login_flutter/app/utils/search_text_normalizer.dart';
 import 'package:login_flutter/data/datasource/remote/ollama_ai_remote_data_source.dart';
 import 'package:login_flutter/data/repositories/ai_search_repository_impl.dart';
+import 'package:login_flutter/domain/entities/search_plan_entity.dart';
 import 'package:login_flutter/domain/entities/song_entity.dart';
 import 'package:login_flutter/domain/repositories/ai_search_repository.dart';
 import 'package:login_flutter/domain/usecases/analyze_search_query_usecase.dart';
@@ -32,9 +33,49 @@ final searchNotifierProvider =
 
 class SearchNotifier extends StateNotifier<SearchState> {
   final AnalyzeSearchQueryUseCase analyzeSearchQueryUseCase;
+  final Map<String, SearchPlanEntity> _planCache = {};
+  String _activeQueryKey = '';
+  int _requestVersion = 0;
 
   SearchNotifier({required this.analyzeSearchQueryUseCase})
-    : super(SearchInitial());
+    : super(const SearchInitial());
+
+  void preview({required String query, required List<SongEntity> songs}) {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) {
+      _activeQueryKey = '';
+      _requestVersion++;
+      state = const SearchInitial();
+      return;
+    }
+
+    final cacheKey = _cacheKey(trimmed);
+    if (cacheKey != _activeQueryKey) {
+      _activeQueryKey = cacheKey;
+      _requestVersion++;
+    }
+
+    final cachedPlan = _planCache[cacheKey];
+    if (cachedPlan != null) {
+      state = SearchLoaded(
+        results: _buildResultsFromPlan(
+          songs: songs,
+          query: trimmed,
+          plan: cachedPlan,
+        ),
+        plan: cachedPlan,
+      );
+      return;
+    }
+
+    state = SearchLoading(
+      previewResults: _buildResultsFromPlan(
+        songs: songs,
+        query: trimmed,
+        plan: _buildKeywordPlan(trimmed),
+      ),
+    );
+  }
 
   Future<void> search({
     required String query,
@@ -42,27 +83,112 @@ class SearchNotifier extends StateNotifier<SearchState> {
   }) async {
     final trimmed = query.trim();
     if (trimmed.isEmpty) {
-      state = SearchInitial();
+      _activeQueryKey = '';
+      _requestVersion++;
+      state = const SearchInitial();
       return;
     }
 
-    state = SearchLoading();
+    final cacheKey = _cacheKey(trimmed);
+    if (cacheKey != _activeQueryKey) {
+      preview(query: trimmed, songs: songs);
+    }
+
+    final requestVersion = _requestVersion;
+    final cachedPlan = _planCache[cacheKey];
+    if (cachedPlan != null) {
+      state = SearchLoaded(
+        results: _buildResultsFromPlan(
+          songs: songs,
+          query: trimmed,
+          plan: cachedPlan,
+        ),
+        plan: cachedPlan,
+      );
+      return;
+    }
 
     try {
       final plan = await analyzeSearchQueryUseCase(trimmed);
-      final results = _rankSongs(
+      if (!_isLatestRequest(cacheKey, requestVersion)) {
+        return;
+      }
+
+      _planCache[cacheKey] = plan;
+      final results = _buildResultsFromPlan(
         songs: songs,
         query: trimmed,
-        keywords: plan.keywords,
-        artistHints: plan.artistHints,
-        titleHints: plan.titleHints,
-        tagHints: plan.tagHints,
+        plan: plan,
       );
 
       state = SearchLoaded(results: results, plan: plan);
     } catch (e) {
-      state = SearchError(e.toString());
+      if (!_isLatestRequest(cacheKey, requestVersion)) {
+        return;
+      }
+
+      final fallbackPlan = _buildKeywordPlan(
+        trimmed,
+        reason: _cleanError(e),
+        provider: 'rule',
+      );
+      state = SearchLoaded(
+        results: _buildResultsFromPlan(
+          songs: songs,
+          query: trimmed,
+          plan: fallbackPlan,
+        ),
+        plan: fallbackPlan,
+      );
     }
+  }
+
+  String _cacheKey(String query) => normalizeSearchText(query);
+
+  bool _isLatestRequest(String cacheKey, int requestVersion) {
+    return cacheKey == _activeQueryKey && requestVersion == _requestVersion;
+  }
+
+  List<SongEntity> _buildResultsFromPlan({
+    required List<SongEntity> songs,
+    required String query,
+    required SearchPlanEntity plan,
+  }) {
+    return _rankSongs(
+      songs: songs,
+      query: query,
+      keywords: plan.keywords,
+      artistHints: plan.artistHints,
+      titleHints: plan.titleHints,
+      tagHints: plan.tagHints,
+    );
+  }
+
+  SearchPlanEntity _buildKeywordPlan(
+    String query, {
+    String reason = '',
+    String provider = 'keyword',
+  }) {
+    final keywords = tokenizeSearchInputs([query]);
+
+    return SearchPlanEntity(
+      originalQuery: query,
+      keywords: keywords.isEmpty ? normalizeSearchPhrases([query]) : keywords,
+      artistHints: const [],
+      titleHints: const [],
+      tagHints: const [],
+      provider: provider,
+      reason: reason,
+    );
+  }
+
+  String _cleanError(Object error) {
+    const prefix = 'Exception: ';
+    final message = error.toString();
+    if (message.startsWith(prefix)) {
+      return message.substring(prefix.length);
+    }
+    return message;
   }
 
   List<SongEntity> _rankSongs({

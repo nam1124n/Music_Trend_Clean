@@ -5,7 +5,7 @@ import 'package:login_flutter/domain/repositories/ai_search_repository.dart';
 
 class AiSearchRepositoryImpl implements AiSearchRepository {
   final OllamaAiRemoteDataSource remoteDataSource;
-  final String localBaseUrl;
+  final List<String> localBaseUrls;
   final String localModel;
   final String cloudBaseUrl;
   final String cloudModel;
@@ -13,55 +13,61 @@ class AiSearchRepositoryImpl implements AiSearchRepository {
   AiSearchRepositoryImpl(
     this.remoteDataSource, {
     String? localBaseUrl,
+    List<String>? localBaseUrls,
     String? localModel,
     String? cloudBaseUrl,
     String? cloudModel,
-  }) : localBaseUrl = localBaseUrl ?? AiConfig.localBaseUrl,
+  }) : localBaseUrls = _resolveLocalBaseUrls(
+         localBaseUrl: localBaseUrl,
+         localBaseUrls: localBaseUrls,
+       ),
        localModel = localModel ?? AiConfig.localModel,
        cloudBaseUrl = cloudBaseUrl ?? AiConfig.cloudBaseUrl,
        cloudModel = cloudModel ?? AiConfig.cloudModel;
 
   @override
   Future<SearchPlanEntity> analyzeQuery(String query) async {
-    Object? localError;
+    final localErrors = <String>[];
     Object? cloudError;
 
-    try {
-      final data = await remoteDataSource.analyzeQuery(
-        baseUrl: localBaseUrl,
-        query: query,
-        model: localModel,
-      );
-      return _map(query, data, 'local');
-    } catch (error) {
-      localError = error;
-
-      if (cloudBaseUrl.isNotEmpty) {
-        try {
-          final data = await remoteDataSource.analyzeQuery(
-            baseUrl: cloudBaseUrl,
-            query: query,
-            model: cloudModel,
-          );
-          return _map(query, data, 'cloud');
-        } catch (error) {
-          cloudError = error;
-        }
+    for (final baseUrl in localBaseUrls) {
+      try {
+        final data = await remoteDataSource.analyzeQuery(
+          baseUrl: baseUrl,
+          query: query,
+          model: localModel,
+        );
+        return _map(query, data, 'local');
+      } catch (error) {
+        localErrors.add('$baseUrl -> ${_cleanError(error)}');
       }
-
-      return SearchPlanEntity(
-        originalQuery: query,
-        keywords: query.toLowerCase().split(' '),
-        artistHints: const [],
-        titleHints: const [],
-        tagHints: const [],
-        provider: 'rule',
-        reason: _buildFallbackReason(
-          localError: localError,
-          cloudError: cloudError,
-        ),
-      );
     }
+
+    if (cloudBaseUrl.isNotEmpty) {
+      try {
+        final data = await remoteDataSource.analyzeQuery(
+          baseUrl: cloudBaseUrl,
+          query: query,
+          model: cloudModel,
+        );
+        return _map(query, data, 'cloud');
+      } catch (error) {
+        cloudError = error;
+      }
+    }
+
+    return SearchPlanEntity(
+      originalQuery: query,
+      keywords: query.toLowerCase().split(' '),
+      artistHints: const [],
+      titleHints: const [],
+      tagHints: const [],
+      provider: 'rule',
+      reason: _buildFallbackReason(
+        localErrors: localErrors,
+        cloudError: cloudError,
+      ),
+    );
   }
 
   SearchPlanEntity _map(
@@ -84,11 +90,14 @@ class AiSearchRepositoryImpl implements AiSearchRepository {
     );
   }
 
-  String _buildFallbackReason({Object? localError, Object? cloudError}) {
+  String _buildFallbackReason({
+    required List<String> localErrors,
+    Object? cloudError,
+  }) {
     final parts = <String>['Fallback search thuong'];
 
-    if (localError != null) {
-      parts.add('Local AI loi: ${_cleanError(localError)}');
+    if (localErrors.isNotEmpty) {
+      parts.add('Local AI loi: ${localErrors.join(' | ')}');
     }
 
     if (cloudError != null) {
@@ -105,5 +114,21 @@ class AiSearchRepositoryImpl implements AiSearchRepository {
       return message.substring(prefix.length);
     }
     return message;
+  }
+
+  static List<String> _resolveLocalBaseUrls({
+    String? localBaseUrl,
+    List<String>? localBaseUrls,
+  }) {
+    final normalizedBaseUrls = [
+      ...?localBaseUrls,
+      ?localBaseUrl,
+    ].map((value) => value.trim()).where((value) => value.isNotEmpty).toSet();
+
+    if (normalizedBaseUrls.isNotEmpty) {
+      return normalizedBaseUrls.toList();
+    }
+
+    return AiConfig.localBaseUrls;
   }
 }

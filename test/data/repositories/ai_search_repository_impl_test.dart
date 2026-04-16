@@ -64,6 +64,38 @@ void main() {
       expect(plan.reason, 'Cloud fallback matched artist');
     });
 
+    test('tries the next local Android endpoint before using cloud', () async {
+      final repository = AiSearchRepositoryImpl(
+        _FakeOllamaAiRemoteDataSource(
+          onAnalyzeQuery: ({required baseUrl, required query, required model}) {
+            if (baseUrl == 'http://10.0.2.2:11434/api') {
+              throw Exception('Connection refused');
+            }
+
+            expect(baseUrl, 'http://127.0.0.1:11434/api');
+            expect(model, 'llama3:latest');
+            return Future.value({
+              'keywords': ['son tung'],
+              'artistHints': ['son tung m-tp'],
+              'titleHints': const <String>[],
+              'reason': 'Android local fallback matched artist',
+            });
+          },
+        ),
+        localBaseUrls: const [
+          'http://10.0.2.2:11434/api',
+          'http://127.0.0.1:11434/api',
+        ],
+        localModel: 'llama3:latest',
+      );
+
+      final plan = await repository.analyzeQuery('son tung');
+
+      expect(plan.provider, 'local');
+      expect(plan.artistHints, ['son tung m-tp']);
+      expect(plan.reason, 'Android local fallback matched artist');
+    });
+
     test(
       'returns rule fallback with error details when all AI providers fail',
       () async {
@@ -90,7 +122,9 @@ void main() {
         expect(plan.keywords, ['son', 'tung']);
         expect(
           plan.reason,
-          contains("Local AI loi: Ollama error: model 'gemma3' not found"),
+          contains(
+            "Local AI loi: http://local -> Ollama error: model 'gemma3' not found",
+          ),
         );
         expect(plan.reason, contains('Cloud AI loi: Connection timeout'));
       },

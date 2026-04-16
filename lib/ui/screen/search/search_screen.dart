@@ -32,8 +32,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }
 
   void _onQueryChanged(String value, List<SongEntity> songs) {
+    ref
+        .read(searchNotifierProvider.notifier)
+        .preview(query: value, songs: songs);
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 600), () {
+    if (value.trim().isEmpty) {
+      return;
+    }
+
+    _debounce = Timer(const Duration(milliseconds: 350), () {
       ref
           .read(searchNotifierProvider.notifier)
           .search(query: value, songs: songs);
@@ -104,7 +111,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     }
 
     if (searchState is SearchLoading) {
-      return const Center(child: CircularProgressIndicator());
+      if (searchState.previewResults.isEmpty) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      return Column(
+        children: [
+          const LinearProgressIndicator(minHeight: 2),
+          const SizedBox(height: 12),
+          Expanded(child: _buildResultsList(searchState.previewResults)),
+        ],
+      );
     }
 
     if (searchState is SearchError) {
@@ -126,28 +143,30 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         children: [
           SearchInfoCard(plan: searchState.plan),
           const SizedBox(height: 12),
-          Expanded(
-            child: ListView.separated(
-              itemCount: searchState.results.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final song = searchState.results[index];
-                return SearchResultTile(
-                  song: song,
-                  onTap: () {
-                    ref
-                        .read(audioPlayerNotifierProvider.notifier)
-                        .playSong(song, playlist: searchState.results);
-                    ref.read(recentNotifierProvider.notifier).addRecent(song);
-                  },
-                );
-              },
-            ),
-          ),
+          Expanded(child: _buildResultsList(searchState.results)),
         ],
       );
     }
 
     return Center(child: Text(l10n.enterSearchPrompt));
+  }
+
+  Widget _buildResultsList(List<SongEntity> results) {
+    return ListView.separated(
+      itemCount: results.length,
+      separatorBuilder: (_, _) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final song = results[index];
+        return SearchResultTile(
+          song: song,
+          onTap: () {
+            ref
+                .read(audioPlayerNotifierProvider.notifier)
+                .playSong(song, playlist: results);
+            ref.read(recentNotifierProvider.notifier).addRecent(song);
+          },
+        );
+      },
+    );
   }
 }

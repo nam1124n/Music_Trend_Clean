@@ -1,23 +1,30 @@
 import 'package:flutter/foundation.dart';
 
 class AiConfig {
-  static String get localBaseUrl {
-    const configuredBaseUrl = String.fromEnvironment(
-      'OLLAMA_LOCAL_BASE_URL',
-      defaultValue: '',
+  static List<String> get localBaseUrls {
+    final configuredBaseUrls = _splitBaseUrls(
+      const String.fromEnvironment('OLLAMA_LOCAL_BASE_URL', defaultValue: ''),
     );
-    if (configuredBaseUrl.isNotEmpty) {
-      return configuredBaseUrl;
+    if (configuredBaseUrls.isNotEmpty) {
+      return configuredBaseUrls;
     }
 
     if (kIsWeb) {
-      return 'http://127.0.0.1:11434/api';
+      return const ['http://127.0.0.1:11434/api'];
     }
 
     return switch (defaultTargetPlatform) {
-      TargetPlatform.android => 'http://10.0.2.2:11434/api',
-      _ => 'http://127.0.0.1:11434/api',
+      TargetPlatform.android => const [
+        'http://10.0.2.2:11434/api',
+        'http://127.0.0.1:11434/api',
+        'http://10.0.3.2:11434/api',
+      ],
+      _ => const ['http://127.0.0.1:11434/api'],
     };
+  }
+
+  static String get localBaseUrl {
+    return localBaseUrls.first;
   }
 
   static String get cloudBaseUrl =>
@@ -41,4 +48,13 @@ class AiConfig {
 
   static int get timeoutSeconds =>
       const int.fromEnvironment('OLLAMA_TIMEOUT_SECONDS', defaultValue: 60);
+
+  static List<String> _splitBaseUrls(String rawValue) {
+    return rawValue
+        .split(RegExp(r'[,;\n]'))
+        .map((value) => value.trim())
+        .where((value) => value.isNotEmpty)
+        .toSet()
+        .toList();
+  }
 }
