@@ -22,11 +22,6 @@ class AdminYearSongFormScreen extends ConsumerStatefulWidget {
 
 class _AdminYearSongFormScreenState
     extends ConsumerState<AdminYearSongFormScreen> {
-  static final List<int> _years = List<int>.generate(
-    9,
-    (index) => 2026 - index,
-  );
-
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _artistController = TextEditingController();
@@ -40,6 +35,21 @@ class _AdminYearSongFormScreenState
   bool get _isEditing => widget.initialSong != null;
   bool get _hasExistingImage => (widget.initialSong?.imageUrl ?? '').isNotEmpty;
   bool get _hasExistingAudio => (widget.initialSong?.audioUrl ?? '').isNotEmpty;
+  List<int> get _availableYears {
+    final currentYear = DateTime.now().year;
+    final years = List<int>.generate(
+      (currentYear - 1950) + 2,
+      (index) => currentYear + 1 - index,
+    );
+
+    final initialYear = widget.initialSong?.savedAt?.year;
+    if (initialYear != null && !years.contains(initialYear)) {
+      years.add(initialYear);
+      years.sort((left, right) => right.compareTo(left));
+    }
+
+    return years;
+  }
 
   @override
   void initState() {
@@ -52,8 +62,7 @@ class _AdminYearSongFormScreenState
 
     _titleController.text = initialSong.title;
     _artistController.text = initialSong.artist;
-    final year = initialSong.savedAt?.year;
-    _selectedYear = _years.contains(year) ? year : null;
+    _selectedYear = initialSong.savedAt?.year;
   }
 
   @override
@@ -302,7 +311,7 @@ class _AdminYearSongFormScreenState
               DropdownButtonFormField<int>(
                 initialValue: _selectedYear,
                 decoration: _inputDeco(l10n.selectYearHint),
-                items: _years
+                items: _availableYears
                     .map(
                       (year) => DropdownMenuItem<int>(
                         value: year,
